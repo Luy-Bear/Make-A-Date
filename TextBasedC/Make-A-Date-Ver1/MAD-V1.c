@@ -77,6 +77,8 @@
                     {"fi", required_argument, 0, 'i'},
                     {"fo", required_argument, 0, 'o'},
                     {"or", required_argument, 0, 'r'},
+                    {"has", required_argument, 0, 'h'},
+                    {"in", required_argument, 0, 'n'},
                     {0, 0, 0, 0}  // Terminator
                 };
 
@@ -144,6 +146,22 @@
                                 }
                             } 
                             break;
+                        
+                        case 'h':
+                            //When user has --has argument flag it will only print out the values where the argument after is found inside the date
+                            printf("\n\n HAS DETECTED \n\n");
+                            // STORE WHAT SEARCH VALUE IS IN A VAR (PLACE THESE OUTSIDE)
+                                // char *has_search_term = NULL;
+                                // char *has_search_column = NULL;
+                            //  has_search_term = optarg;  // Store "coffee"
+
+                            //Later when filtering dates, check if the term exists
+                            break;
+
+                        case 'n': //These is if user puts "in" in the arguemnts
+                                // has_search_column = StrToUpper(optarg);  // Store "TYPE"
+                            break;
+
                         default:
                             // if another flag found its wrong - return error message and exit
                             fprintf(stderr, "Usage: %s -f(i|o) field1 [field2...] -Or field [asc|desc]\n", 
@@ -310,13 +328,14 @@
 
                         
                     }
-                else(){
+                }
+                else{
                         for(int i = 0; i < array_size; i++) {
                             cJSON *Date = cJSON_GetArrayItem(json, i);
                             Dates[i] = Date;
                         }
                     }
-                }
+                
                 
                 PrintJSONObjs(FlagArr, Dates, array_size);
                 free(Dates);
