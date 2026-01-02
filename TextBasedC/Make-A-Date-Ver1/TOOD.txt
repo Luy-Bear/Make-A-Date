@@ -1,0 +1,13 @@
+TODO:
+    Flag Parsing
+        Adjust the flag searching to limit the potential options on read to group/dsc/asc
+        Adjust flag searching to throw error if coloumns arent listed even before printing?
+        Figure out why i can list 100 items args in the flag and it not be an issue with the [10]
+
+    Printing Method
+        Now i have a list of columns to include/exclude and order by adjust printing method to print properly and not have mem leaks!
+        Bunch of select case/if statements:
+            - Calls a helper function to generate string of column value
+            - Adjust string for formatting
+            - Then prints row!
+

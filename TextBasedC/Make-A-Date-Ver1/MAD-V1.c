@@ -1,0 +1,475 @@
+    // Get CMD line prompts [ ??,??]
+        // Add Dates too list based on filters
+            // (results in smaller mem allocaiton and less time deallocating)
+
+    // Reorder list on order if specified
+
+    // Print list fomrat + list item (COLOUR CODED??)
+        // Header and table top ASCII art stuff
+        // For every date
+            // blank line with walls (set fn!)
+            //  L Wall and indent
+            // Date attr and dividers (consider wrap)
+            // R wall
+            // blank line with walls (set fn!)
+        // Table floor!
+
+
+        // Function to go through list and deallocate mem
+
+
+    #include <stdio.h> //prints
+    #include <string.h> //string copmarisons
+    #include <ctype.h> //strupr
+    #include <cjson/cJSON.h> //JSON handling
+    #include <stdlib.h> //Malloc stuff
+    #include <unistd.h> //flag options
+    #include <getopt.h>
+    // Explicitly declare getopt variables
+    extern char *optarg;
+    extern int optind, opterr, optopt;
+
+    //Defining cloumn widths
+    #define IDEA_WIDTH 15
+    #define TYPE_WIDTH 15
+    #define SEASONAL_WIDTH 10
+    #define DATE_WIDTH 7
+    #define LOCATION_WIDTH 10
+    #define NOTES_WIDTH 30
+
+    // Uppercase a string
+    char * StrToUpper(char *in);
+
+    //Returns a string in memory 
+    char * ReturnStrXLength(int X, char* str);
+    
+    //Returns JSON attributes but makes it more readable
+    int ReturnJsonID(cJSON * JSON);
+    char * ReturnJsonIdea(cJSON * JSON);
+    char * ReturnJsonType(cJSON * JSON);
+    char * ReturnJsonSeasonal(cJSON * JSON);
+    char * ReturnJsonDate(cJSON * JSON);
+    char * ReturnJsonLocation(cJSON * JSON);
+    char * ReturnJsonNotes(cJSON * JSON);
+
+    //print JSON function
+    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums);
+
+    
+    int main(int argc, char *argv[]){
+        //Argc argument counter, arv is argument vector, array of char pointers listing all args
+       
+        //If there are command line arguments - run, else quit
+        if(argc > 1){
+            // Check if read or write
+            if(strcmp(StrToUpper(argv[1]), "READ") == 0){
+                // FLAG PARSING SECTION
+                int opt;
+                char filter_field = '\0';
+                char *filter_fields[6]; //Max nuber is 6 (number of cols in json) 
+                int filter_count = 0;
+                char *order_field = NULL;
+                char *order_direction = NULL;
+                optind =2; //Option index
+
+                // Define long options
+                struct option long_options[] = {
+                    {"fi", required_argument, 0, 'i'},
+                    {"fo", required_argument, 0, 'o'},
+                    {"or", required_argument, 0, 'r'},
+                    {0, 0, 0, 0}  // Terminator
+                };
+
+                // Flag to check f user called both filter options at once
+                int DoulbeFilterFlag = 0;
+
+                // Parse filter arguments and options
+                // opt will check letter by letter for -f and/or -o,if unkown option found (e.g -z) defualt is hit, if nothing else to check -1 returned 
+                while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
+                    switch (opt) {
+                        //If it finds fi it will...
+                        case 'i':
+                            if(!DoulbeFilterFlag){
+                                DoulbeFilterFlag=1;
+                                filter_field = 'i';
+                            }
+                            else{
+                                fprintf(stderr, "Usage: Use of conflicting filter options (both Filter In and Filter Out detected)");
+                                exit(EXIT_FAILURE);
+                            }
+                            // Adds argument into fields array
+                            filter_fields[filter_count++] = StrToUpper(optarg);
+                            // Continue collecting non-option arguments - 
+                            // if there are more arguments than the one i am looking at and the next argument doesnt start wit a -f we keep going.
+                            while (optind < argc && argv[optind][0] != '-') {
+                                filter_fields[filter_count++] = StrToUpper(argv[optind]);
+                                optind++;
+                            }
+                            break;                        //If it finds fo it will...
+                        case 'o':
+                            if(!DoulbeFilterFlag){
+                                DoulbeFilterFlag=1;
+                                filter_field = 'o';
+                            }
+                            else{
+                                fprintf(stderr, "Usage: Conflicting filter options (both Filter In and Filter Out detected)\n");
+                                exit(EXIT_FAILURE);
+                            }
+                            // Adds argument into fields array
+                            filter_fields[filter_count++] = StrToUpper(optarg);
+                            // Continue collecting non-option arguments - 
+                            // if there are more arguments than the one i am looking at and the neet argument doesnt start wit a -f we keep going.
+                            while (optind < argc && argv[optind][0] != '-') {
+                                filter_fields[filter_count++] = StrToUpper(argv[optind]);
+                                optind++;
+                            }
+                            break;
+                        // if it finds o it will...
+                        case 'r':
+                            // Take the argument as what to order it by 
+                            order_field = StrToUpper(optarg);
+                            // if there are more options, and theyre not a flag
+                            if (optind < argc && argv[optind][0] != '-') {// take argumnet as direction but only if ASC or DESC (works for EVERYTHING)
+                                //Storing order direction as a varialbe becuase i will use it later on probably 
+
+                                // strcmp returns 0 if string are identical, <0 if str1 comes before alphabetically and >0 if str1 comes after str 2 alphabetically 
+                                if(strcmp((StrToUpper(argv[optind])), "ASC") == 0 || strcmp((argv[optind]), "DESC") == 0){
+                                    order_direction = StrToUpper(argv[optind]);
+                                    optind++;
+                                }
+                                else{
+                                    //If the order is not ascending or descending it is not valid
+                                    fprintf(stderr, "Not a valid ordering direction - must be ASCending or DESCending\n");
+                                    exit(EXIT_FAILURE);
+                                }
+                            } 
+                            break;
+                        default:
+                            // if another flag found its wrong - return error message and exit
+                            fprintf(stderr, "Usage: %s -f(i|o) field1 [field2...] -Or field [asc|desc]\n", 
+                                    argv[0]);
+                            exit(EXIT_FAILURE);
+                    }
+                }
+
+                // Display what was parsed
+                if(filter_field == 'i'){printf("Filter In fields: ");}
+                else if(filter_field == 'o'){printf("Filter Out fields: ");}
+
+                //Display arguments
+                for (int i = 0; i < filter_count; i++) {
+                    printf("%s, ", filter_fields[i]);
+                }
+                printf("\n");
+                
+                if (order_field) {
+                    printf("Order by: %s %s\n", order_field, 
+                        order_direction ? order_direction : "ASC (by default)");
+                }
+                
+ 
+                // Open file to read
+                FILE * DatesFile = fopen("Dates.json", "r");
+
+                //Check to see if file exists
+                if(DatesFile == NULL){
+                    printf("Error: Unable to open the file.\n");
+                    return 1;
+                }
+
+            //Making buffer the file size exactly
+                //Get filesize
+                fseek(DatesFile, 0, SEEK_END);
+                long file_size = ftell(DatesFile);
+                fseek(DatesFile, 0, SEEK_SET);
+
+                // Allocate mem for buffer
+                char * buffer = malloc(file_size +1); //+1 for null point terminator
+                if (buffer == NULL) {
+                    //if buffer is not a valid number then throw error adn close data file.
+                    printf("Error: Memory allocation failed.\n");
+                    fclose(DatesFile);
+                    //If the files not vaild no point continuining program so exit.
+                    return 1;
+                }
+
+                // Read file into buffer now that we know its valid
+                fread(buffer, 1, file_size, DatesFile);
+                buffer[file_size] = '\0';  // Add null terminator
+                //Once data in buffer close data file.
+                fclose(DatesFile);
+
+                // Pase JSON
+                //Now the file is closed and inside the buffer we can parse JSON
+                cJSON *json = cJSON_Parse(buffer);
+                free(buffer);  
+                
+                // Check to see if theres any valid JSON to look through
+                if (json == NULL) {
+                    const char *error_ptr = cJSON_GetErrorPtr();
+                    if (error_ptr != NULL) {
+                        printf("Error: %s\n", error_ptr);
+                    }
+                    exit(EXIT_FAILURE);
+                }
+
+                // Check if it's an array (i.e more than one JSON objects (more than one date [{date1...},{date2...}] ))
+                if (!cJSON_IsArray(json)) {
+                    printf("Error: Expected JSON array\n");
+                    cJSON_Delete(json);
+                    return 1;
+                }
+
+                // Get array size for loop
+                int array_size = cJSON_GetArraySize(json);
+                printf("Found %d dates...\n\n", array_size);
+
+
+                // Filter Flag Logic - Takes user filters and sets up flags for future use
+                // [0    1    2        3    4        5    ]
+                // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
+
+                int FlagArr[6]={0}; //Makes 6 flags for all columns - ID not filterable, also initialise at 0 to remove garbage data.
+
+                //If not filter specified print eveyrthing so set flag values to 1
+                if(filter_field == '\0'){
+                    //Set flag values to 1
+                    for (int i = 0; i < 6; i++) {
+                        FlagArr[i] = 1;
+                    }
+                }
+                else{
+                    //Loop through all filter fields and uses an if else str compare ladder to set column flags
+                    for(int i=0; i< filter_count; i++){
+                        //Uses more mem short term but speeds up copmuting bu uppercasing once rather than several times
+                        char *upper = StrToUpper(filter_fields[i]);
+
+                        //If the uppercase string == column X, set flag X to 1
+                        if(strcmp(upper, "IDEA") == 0) {
+                            FlagArr[0] = 1;
+                        }
+                        else if(strcmp(upper, "TYPE") == 0) {
+                            FlagArr[1] = 1;
+                        }
+                        else if(strcmp(upper, "SEASONAL") == 0) {
+                            FlagArr[2] = 1;
+                        }
+                        else if(strcmp(upper, "DATE") == 0) {
+                            FlagArr[3] = 1;
+                        }
+                        else if(strcmp(upper, "LOCATION") == 0) {
+                            FlagArr[4] = 1;
+                        }
+                        else if(strcmp(upper, "NOTES") == 0) {
+                            FlagArr[5] = 1;
+                        }
+                        else{
+                            printf("User input of '%s' not found\n", filter_fields[i]);
+                        }
+                    }
+                }
+                
+                //If user species to filter out, flip flags
+                if(filter_field=='o'){
+                    for (int i = 0; i < 6; i++) {
+                        FlagArr[i] = !(FlagArr[i]);
+                    }
+                }
+
+
+                cJSON **Dates = calloc(array_size, sizeof(cJSON *));
+
+                // For every array item, get item,  get the values, assign order into an array which is used to print list.
+                if(order_field != NULL){
+                    for(int i = 0; i < array_size; i++) {
+                        cJSON *Date = cJSON_GetArrayItem(json, i);
+                        //Clean up free incase no mem to allocate
+                        if (Dates == NULL) {
+                            fprintf(stderr, "Error: Memory allocation failed for Dates array\n");
+                            cJSON_Delete(json);
+                            exit(EXIT_FAILURE);
+                        }
+
+                        //TODO check value of col specified, add to list where it is bgger than item before and less tha item ahead of it, add it to Dates array 
+                        if(0){Dates[i] = Date;}
+                        else{
+                            for(int j = 0; j<=i; j++){
+                                //First elem so list is empty so just place it in Dates[0]
+                                if(!i){Dates[0]=Date; continue;}
+                                
+                                //check if date value is smaller than date value @ j (str cmp for strings)
+                                    //Shift everything up by one
+                                    //Place new date value @ j
+                                    //BREAK
+                                //else do nothing, keep checking next J value 
+
+                            }
+                            printf("\n");
+
+                        }
+
+                        
+                    }
+                else(){
+                        for(int i = 0; i < array_size; i++) {
+                            cJSON *Date = cJSON_GetArrayItem(json, i);
+                            Dates[i] = Date;
+                        }
+                    }
+                }
+                
+                PrintJSONObjs(FlagArr, Dates, array_size);
+                free(Dates);
+                cJSON_Delete(json);
+
+                exit(EXIT_SUCCESS);
+            }
+            else if (strcmp(StrToUpper(argv[1]), "WRITE") == 0){
+                printf("GOT INTO WRITE\n");
+            
+                exit(EXIT_SUCCESS);
+            }
+            else{
+                printf("%s is not a valid operation, try read or write.\n\n", argv[1]);
+                
+                exit(EXIT_FAILURE);
+            }
+            
+            printf("USAGE: Make-A-Date required more arguemnts. Please run specifying WRITE or READ and optionally for read filter in or filter out options (--fi or --fo), order by a column and specifically by ASCending or DESC and even select entries WHERE values are found\n");
+            exit(EXIT_FAILURE);
+        }
+
+
+        // Fail case, no args inputed,
+        printf("No command line arguments inputed, specify if it is a read or a write \ninteraction followed if necessary by the order amd filter requierments\n\n");
+        return 1;
+    }
+
+
+
+    char * StrToUpper(char *in){
+        int i = 0;
+        while(in[i] != '\0'){
+            in[i] = toupper(in[i]);
+            i++;
+        }
+        return in;
+    }
+
+    // CALL FREE ON RETURNED STRING (ALSO X is ... inclusive of str length)
+    char * ReturnStrXLength(int X, char* str){
+        // DOESNT modify in place
+
+        // Edge case: X too small for "..."
+        if(X < 4){return NULL;}
+
+        int inStrLen = strlen(str);
+        char *result = malloc(X + 1);  // +1 for null terminator
+
+        // If string is perfect size return it as is
+        if(inStrLen == X){
+            strcpy(result, str);
+            return result; //doing it this way so its always freed no matter what so no mem leaks occur
+        }
+
+        //If its too big, add "..."
+        if(inStrLen > X){
+            strncpy(result, str, X-3);
+            result[X-3] = '.';
+            result[X-2] = '.';
+            result[X-1] = '.';
+            result[X] = '\0'; 
+        }
+        else if (inStrLen < X) //if its too small, add padding
+        {
+            strcpy(result, str);
+            int i = inStrLen;  // Start where string ends
+            while(i < X){
+                result[i] = ' ';
+                i++;
+            }
+            result[X] = '\0';
+        }
+        return result;
+    }
+
+
+    int ReturnJsonID(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "id")->valueint);
+    }
+
+    char * ReturnJsonIdea(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Idea")->valuestring);
+    }
+
+    char * ReturnJsonType(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Type")->valuestring);
+    }
+
+    char * ReturnJsonSeasonal(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Seasonal")->valuestring);
+    }
+
+    char * ReturnJsonDate(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Date")->valuestring);
+    }
+
+    char * ReturnJsonLocation(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Location")->valuestring);
+    }
+
+    char * ReturnJsonNotes(cJSON * JSON){
+        return(cJSON_GetObjectItemCaseSensitive(JSON, "Notes")->valuestring);
+    }
+
+    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums){
+        for(int i = 0; i<DateNums; i++){
+            cJSON *Date = Dates[i];
+            if (Date != NULL) {
+                // Always print the FORMATTED ID
+                printf("Idea %3d: ", ReturnJsonID(Date));
+                
+                // [0    1    2        3    4        5    ]
+                // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
+                //Checks flags to print text
+                
+                if(FlagArr[0]) {
+                    char *formatted = ReturnStrXLength(IDEA_WIDTH, ReturnJsonIdea(Date));
+                    printf("%s | ", formatted);
+                    free(formatted);
+                }
+                
+                if(FlagArr[1]) {
+                    char *formatted = ReturnStrXLength(TYPE_WIDTH, ReturnJsonType(Date));
+                    printf("%s | ", formatted);
+                    free(formatted);
+                }
+                
+                if(FlagArr[2]) {
+                    char *formatted = ReturnStrXLength(SEASONAL_WIDTH, ReturnJsonSeasonal(Date));
+                    printf("%s | ", formatted);
+                    free(formatted);
+                }
+                
+                if(FlagArr[3]) {
+                    char *formatted = ReturnStrXLength(DATE_WIDTH, ReturnJsonDate(Date));
+                    printf("%s | ", formatted);
+                    free(formatted);
+                }
+                
+                if(FlagArr[4]) {
+                    char *formatted = ReturnStrXLength(LOCATION_WIDTH, ReturnJsonLocation(Date));
+                    printf("%s | ", formatted);
+                    free(formatted);
+                }
+                
+                if(FlagArr[5]) {
+                    char *formatted = ReturnStrXLength(NOTES_WIDTH, ReturnJsonNotes(Date));
+                    printf("%s", formatted);  // No " | " at the end
+                    free(formatted);
+                }
+                
+                printf("\n");
+            }
+        }
+    }

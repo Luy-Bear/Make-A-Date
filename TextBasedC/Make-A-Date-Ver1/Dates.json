@@ -1,0 +1,182 @@
+[
+    {
+        "id": 1,
+        "Idea": "200 Degrees",
+        "Type": "Coffee",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "West Bridgeford Central Ave",
+        "Notes": "Slightly round the corner from the stop" 
+    },
+    {
+        "id": 2,
+        "Idea": "Pumpkin Carving",
+        "Type": "Arts and Crafts",
+        "Seasonal": "Halloween",
+        "Date": "X/10/X",
+        "Location": "Home",
+        "Notes": "N/A"
+    },
+    {
+        "id": 3,
+        "Idea": "Ice Skating",
+        "Type": "Activity",
+        "Seasonal": "Winter",
+        "Date": "X/12/X",
+        "Location": "Nottingham Ice Arena",
+        "Notes": "Book tickets in advance during peak season"
+    },
+    {
+        "id": 4,
+        "Idea": "Picnic at Wollaton Park",
+        "Type": "Outdoor",
+        "Seasonal": "Summer",
+        "Date": "X/6/X",
+        "Location": "Wollaton Park",
+        "Notes": "Bring blanket and snacks, deer roam freely"
+    },
+    {
+        "id": 5,
+        "Idea": "Cinema Night",
+        "Type": "Entertainment",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Cineworld Nottingham",
+        "Notes": "Check for student discounts on Wednesdays"
+    },
+    {
+        "id": 6,
+        "Idea": "Bowling",
+        "Type": "Activity",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Tenpin Nottingham",
+        "Notes": "Good for rainy days, arcade games available"
+    },
+    {
+        "id": 7,
+        "Idea": "Broadway Cinema",
+        "Type": "Entertainment",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Hockley",
+        "Notes": "Independent films, has a nice bar and cafe"
+    },
+    {
+        "id": 8,
+        "Idea": "Afternoon Tea",
+        "Type": "Dining",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Hart's Hotel",
+        "Notes": "Booking required, dress smart casual"
+    },
+    {
+        "id": 9,
+        "Idea": "Christmas Market",
+        "Type": "Event",
+        "Seasonal": "Christmas",
+        "Date": "X/12/X",
+        "Location": "Old Market Square",
+        "Notes": "Usually runs late November through December"
+    },
+    {
+        "id": 10,
+        "Idea": "Crazy Golf",
+        "Type": "Activity",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Ghetto Golf",
+        "Notes": "Indoor venue with UV lighting, quirky decor"
+    },
+    {
+        "id": 11,
+        "Idea": "Farmers Market",
+        "Type": "Shopping",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Victoria Centre",
+        "Notes": "Every second and fourth Saturday of the month"
+    },
+    {
+        "id": 12,
+        "Idea": "Escape Room",
+        "Type": "Activity",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Cryptology Nottingham",
+        "Notes": "Book online, multiple themes available"
+    },
+    {
+        "id": 13,
+        "Idea": "Sunset Walk",
+        "Type": "Outdoor",
+        "Seasonal": "Summer",
+        "Date": "X/7/X",
+        "Location": "Attenborough Nature Reserve",
+        "Notes": "Beautiful views, bring insect repellent"
+    },
+    {
+        "id": 14,
+        "Idea": "Nottingham Castle",
+        "Type": "Cultural",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Castle Quarter",
+        "Notes": "Recently renovated, check opening times"
+    },
+    {
+        "id": 15,
+        "Idea": "Pizza Making Class",
+        "Type": "Food Experience",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Annie's Burger Shack",
+        "Notes": "Fun hands-on activity, eat what you make"
+    },
+    {
+        "id": 16,
+        "Idea": "Goose Fair",
+        "Type": "Event",
+        "Seasonal": "Autumn",
+        "Date": "X/10/X",
+        "Location": "Forest Recreation Ground",
+        "Notes": "First week of October, largest travelling fair in UK"
+    },
+    {
+        "id": 17,
+        "Idea": "Brunch at Blend",
+        "Type": "Dining",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Derby Road",
+        "Notes": "Popular spot, weekend queues expected"
+    },
+    {
+        "id": 18,
+        "Idea": "Kayaking on River Trent",
+        "Type": "Activity",
+        "Seasonal": "Summer",
+        "Date": "X/8/X",
+        "Location": "National Water Sports Centre",
+        "Notes": "Equipment provided, beginners welcome"
+    },
+    {
+        "id": 19,
+        "Idea": "Live Music Night",
+        "Type": "Entertainment",
+        "Seasonal": "N/A",
+        "Date": "X/X/X",
+        "Location": "Rock City",
+        "Notes": "Check gig listings online, variety of genres"
+    },
+    {
+        "id": 20,
+        "Idea": "Cherry Blossom Viewing",
+        "Type": "Outdoor",
+        "Seasonal": "Spring",
+        "Date": "X/4/X",
+        "Location": "Arboretum",
+        "Notes": "Peak bloom usually early to mid April"
+    }
+]
