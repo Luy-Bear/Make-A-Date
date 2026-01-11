@@ -37,6 +37,22 @@
     #define LOCATION_WIDTH 10
     #define NOTES_WIDTH 30
 
+    //Defining Col Values
+    #define ID 0
+    #define IDEA 1
+    #define TYPE 2
+    #define SEASONAL 3
+    #define DATE 4
+    #define LOCATION 5
+    #define NOTES 6
+
+
+    //Uses quick sort to sort dates into order
+    void QuickSortDates(int Lower, int Upper, cJSON* Dates[], int ValCol);
+
+    //Function that compares value between JSON dates
+    int CompareJSONDateVals(cJSON* a, cJSON* b, int ValCol)
+
     // Uppercase a string
     char * StrToUpper(char *in);
 
@@ -51,6 +67,7 @@
     char * ReturnJsonDate(cJSON * JSON);
     char * ReturnJsonLocation(cJSON * JSON);
     char * ReturnJsonNotes(cJSON * JSON);
+    
 
     //print JSON function
     void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums);
@@ -69,6 +86,7 @@
                 char *filter_fields[6]; //Max nuber is 6 (number of cols in json) 
                 int filter_count = 0;
                 char *order_field = NULL;
+                int order_field_int = -1;
                 char *order_direction = NULL;
                 optind =2; //Option index
 
@@ -262,24 +280,24 @@
                         //Uses more mem short term but speeds up copmuting bu uppercasing once rather than several times
                         char *upper = StrToUpper(filter_fields[i]);
 
-                        //If the uppercase string == column X, set flag X to 1
+                        //If the uppercase string == column X, set flag X to 1. Array index adjusted as not doing IDs but ordering i will so need 0 to be id therefore offsetting vals in this case
                         if(strcmp(upper, "IDEA") == 0) {
-                            FlagArr[0] = 1;
+                            FlagArr[IDEA-1] = 1;
                         }
                         else if(strcmp(upper, "TYPE") == 0) {
-                            FlagArr[1] = 1;
+                            FlagArr[TYPE-1] = 1;
                         }
                         else if(strcmp(upper, "SEASONAL") == 0) {
-                            FlagArr[2] = 1;
+                            FlagArr[SEASONAL-1] = 1;
                         }
                         else if(strcmp(upper, "DATE") == 0) {
-                            FlagArr[3] = 1;
+                            FlagArr[DATE-1] = 1;
                         }
                         else if(strcmp(upper, "LOCATION") == 0) {
-                            FlagArr[4] = 1;
+                            FlagArr[LOCATION-1] = 1;
                         }
                         else if(strcmp(upper, "NOTES") == 0) {
-                            FlagArr[5] = 1;
+                            FlagArr[NOTES-1] = 1;
                         }
                         else{
                             printf("User input of '%s' not found\n", filter_fields[i]);
@@ -295,46 +313,43 @@
                 }
 
 
+                // Have an empty array to populate with dates to print
+                // We are using this as "json" is a linked list struct not a c array, Dates is an array that points to the original JSON array which lets you sort them with traditional sorting algos but moving the pointers leaving original structure unchanged
+                    // This means i dont accidentally corrupt or change original structure and for array sorts it allows jumping to indicies not o(n) linear look ups by chekcing next n times
+                    // Overall pointer array uses little mem, O(1) access time and simpler to implement without running risk of messing up json struct - at the price of a little more mem
                 cJSON **Dates = calloc(array_size, sizeof(cJSON *));
+                
 
-                // For every array item, get item,  get the values, assign order into an array which is used to print list.
-                if(order_field != NULL){
-                    for(int i = 0; i < array_size; i++) {
-                        cJSON *Date = cJSON_GetArrayItem(json, i);
-                        //Clean up free incase no mem to allocate
-                        if (Dates == NULL) {
-                            fprintf(stderr, "Error: Memory allocation failed for Dates array\n");
-                            cJSON_Delete(json);
-                            exit(EXIT_FAILURE);
-                        }
-
-                        //TODO check value of col specified, add to list where it is bgger than item before and less tha item ahead of it, add it to Dates array 
-                        if(0){Dates[i] = Date;}
-                        else{
-                            for(int j = 0; j<=i; j++){
-                                //First elem so list is empty so just place it in Dates[0]
-                                if(!i){Dates[0]=Date; continue;}
-                                
-                                //check if date value is smaller than date value @ j (str cmp for strings)
-                                    //Shift everything up by one
-                                    //Place new date value @ j
-                                    //BREAK
-                                //else do nothing, keep checking next J value 
-
-                            }
-                            printf("\n");
-
-                        }
-
-                        
-                    }
+                //Clean up free incase no mem to allocated
+                if (Dates == NULL) {
+                    fprintf(stderr, "Error: Memory allocation failed for Dates array\n");
+                    cJSON_Delete(json);
+                    exit(EXIT_FAILURE);
                 }
-                else{
-                        for(int i = 0; i < array_size; i++) {
-                            cJSON *Date = cJSON_GetArrayItem(json, i);
-                            Dates[i] = Date;
-                        }
-                    }
+
+                //Adds all the JSON elements into Dates array
+                for(int i = 0; i < array_size; i++) {
+                    cJSON *Date = cJSON_GetArrayItem(json, i);
+                    Dates[i] = Date;
+                }
+
+                // If user specifies a col to order by, order it in place in Dates arr and then print it using quick sort ...
+                if(order_field != NULL){    
+                    //Check what col to order by to pass into helper function to compare values of dates
+                    if(strcmp(order_field, "ID") == 0) order_field_int = ID;
+                    else if(strcmp(order_field, "IDEA") == 0) order_field_int = IDEA;
+                    else if(strcmp(order_field, "TYPE") == 0) order_field_int = TYPE;
+                    else if(strcmp(order_field, "SEASONAL") == 0) order_field_int = SEASONAL;
+                    else if(strcmp(order_field, "DATE") == 0) order_field_int = DATE;
+                    else if(strcmp(order_field, "LOCATION") == 0) order_field_int = LOCATION;
+                    else if(strcmp(order_field, "NOTES") == 0) order_field_int = NOTES;
+                    
+                //TODO Implement quick sort as a recursive function
+                    QuickSortDates(0, array_size-1, Dates, order_field_int); 
+
+                // TODO Check order direction and flip array if needed for DESC (like flag flipping section) - means just one print function called after
+                }
+                // ....if no order specified skip the if statement above and just print out in order it is read in
                 
                 
                 PrintJSONObjs(FlagArr, Dates, array_size);
@@ -365,6 +380,108 @@
     }
 
 
+    void QuickSortDates(int LowerLim, int UpperLim, cJSON* Dates[], int ValCol){
+        // Check if i can do median of 3...
+        //if one do nothing, leave as cant sort anymore. 
+        if(!(LowerLim >= UpperLim)){
+            //if two sort and return
+            if(UpperLim-LowerLim == 1){
+                //If lower lim date is bigger than upper lim (a>b), swap using temp value, else its in order and do nothing
+                if(CompareJSONDateVals(Dates[LowerLim],Dates[UpperLim],ValCol)>0){
+                    cJSON* temp = Dates[UpperLim];
+                    Dates[UpperLim] = Dates[LowerLim];
+                    Dates[LowerLim] = temp; 
+                }
+            }
+            //otherwise theres more than 2 elements and you can do median logic!
+            else{
+            int PivotIndex; //Var for pivot index to be stored in once returned.
+            
+//TODO CONTINUE CHANGING THE COMPARISON OF VALUES FROM DATES[X] TO COMPAREJSONDATEVALS(DATE[X], DATE[Y], VALCOL) FROM HERE DOWNWARDS
+
+            //Median of Three Approach: Check 3 values find median and use that value as index for pivot
+                //Calculate the median value out of indecies 0, N/2, N - 6 Possible condiitons: a b c || a c b || c b a || b c a || c a b || b a c	
+                // Checks conditions where a is smaller than b, then check if b smaller than c to determin if abc or acb
+                //where a = LowerLim, b = (LowerLim+UpperLim)/2 , c = UpperLim
+                
+                if(Dates[LowerLim] < Dates[(LowerLim+UpperLim)/2]){//a < b but where is c?
+                    if(Dates[(LowerLim+UpperLim)/2] < Dates[UpperLim]){PivotIndex = (LowerLim+UpperLim)/2;}//a b c
+                    else if(Dates[UpperLim] < Dates[LowerLim]){PivotIndex = LowerLim;}//c a b
+                    else{PivotIndex = UpperLim;}//a c b
+                        
+                }
+                else{//b < a but where is c?
+                    if(Dates[LowerLim] < Dates[UpperLim]){PivotIndex = LowerLim;}//b a c
+                    else if(Dates[(LowerLim+UpperLim)/2] < Dates[UpperLim]){PivotIndex = UpperLim;} //b c a
+                    else{PivotIndex = (LowerLim+UpperLim)/2;}//c b a
+                }
+
+                //Now have pivot @ index stored with PivotIndex
+                int LPointer = LowerLim, RPointer = UpperLim;
+
+                
+                // Now order round the pivot....WHile (L pointer <= L pointer)
+                //Swap the pivot with the far right value
+                //Have a pointer on first index and last index -1 (ignore pivot)
+                    //if L pointer val > pivot val (Needs changing)
+                        // if R pointer val < pivot val (Needs changing)
+                            // swap pointer values
+                            // shift R by -1, L by +1
+                        // else just move R and wait until a pair of misfits found 
+                            // shift R pointer -1
+                    //else
+                        //shift L pointer by +1 (doesnt need changing, wont swap so doesnt need to keep value)
+                        //if R pointer val > pivot val (doesnt need changing so move pointer)
+                            //shift R pointer by -1
+                        // (else needs to swap but cant becuase L doesnt so keep pointer the same)
+            //Ordering done, the pivots are now the same or have "swapped" sides
+            //Put the value in L at upper index
+            //Put pivot at L (using temp value to not overwrite values)
+            //recursive call twice:
+                //QuickSortDates(LowerLim, L-1) 
+                //QuickSortDates(L+1, UpperLim) DONT USE R becuase what if L==R???
+                
+            
+                
+
+
+
+            }
+        }
+        return;        
+    }
+
+    //Copmares the values specified by ValCol of two dates and return which one is bigger than or equal to or smaller than the other as:
+    //return x < 0
+    //return x = 0
+    //return x > 1 
+    int CompareJSONDateVals(cJSON* a, cJSON* b, int ValCol){
+        switch(ValCol) {
+            case ID:  // Integer comparison
+                return ReturnJsonID(a) - ReturnJsonID(b);
+                
+            case IDEA:  // String comparison
+                return strcmp(ReturnJsonIdea(a), ReturnJsonIdea(b));
+                
+            case TYPE:
+                return strcmp(ReturnJsonType(a), ReturnJsonType(b));
+                
+            case SEASONAL:
+                return strcmp(ReturnJsonSeasonal(a), ReturnJsonSeasonal(b));
+            
+            case DATE:
+                return strcmp(ReturnJsonDate(a), ReturnJsonDate(b));
+            
+            case LOCATION:
+                return strcmp(ReturnJsonLocation(a), ReturnJsonLocation(b));
+        
+            case NOTES:
+                return strcmp(ReturnJsonNotes(a), ReturnJsonNotes(b));
+    
+            default:
+                return 0;  // Should never happen
+        }
+    }
 
     char * StrToUpper(char *in){
         int i = 0;
