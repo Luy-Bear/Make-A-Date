@@ -51,7 +51,7 @@
     void QuickSortDates(int Lower, int Upper, cJSON* Dates[], int ValCol);
 
     //Function that compares value between JSON dates
-    int CompareJSONDateVals(cJSON* a, cJSON* b, int ValCol)
+    int CompareJSONDateVals(cJSON* a, cJSON* b, int ValCol);
 
     // Uppercase a string
     char * StrToUpper(char *in);
@@ -404,15 +404,15 @@
                 // Checks conditions where a is smaller than b, then check if b smaller than c to determin if abc or acb
                 //where a = LowerLim, b = (LowerLim+UpperLim)/2 , c = UpperLim
                 
-                if(Dates[LowerLim] < Dates[(LowerLim+UpperLim)/2]){//a < b but where is c?
-                    if(Dates[(LowerLim+UpperLim)/2] < Dates[UpperLim]){PivotIndex = (LowerLim+UpperLim)/2;}//a b c
-                    else if(Dates[UpperLim] < Dates[LowerLim]){PivotIndex = LowerLim;}//c a b
+                if(CompareJSONDateVals(Dates[LowerLim], Dates[(LowerLim+UpperLim)/2], ValCol) < 0){ //a < b but where is c?
+                    if(CompareJSONDateVals(Dates[(LowerLim+UpperLim)/2], Dates[UpperLim], ValCol) < 0){PivotIndex = (LowerLim+UpperLim)/2;}//a b c
+                    else if(CompareJSONDateVals(Dates[UpperLim], Dates[LowerLim], ValCol) < 0){PivotIndex = LowerLim;}//c a b
                     else{PivotIndex = UpperLim;}//a c b
                         
                 }
                 else{//b < a but where is c?
-                    if(Dates[LowerLim] < Dates[UpperLim]){PivotIndex = LowerLim;}//b a c
-                    else if(Dates[(LowerLim+UpperLim)/2] < Dates[UpperLim]){PivotIndex = UpperLim;} //b c a
+                    if(CompareJSONDateVals(Dates[LowerLim], Dates[UpperLim], ValCol) < 0){PivotIndex = LowerLim;}//b a c
+                    else if(CompareJSONDateVals(Dates[(LowerLim+UpperLim)/2], Dates[UpperLim], ValCol) < 0){PivotIndex = UpperLim;} //b c a
                     else{PivotIndex = (LowerLim+UpperLim)/2;}//c b a
                 }
 
