@@ -397,8 +397,6 @@
             else{
             int PivotIndex; //Var for pivot index to be stored in once returned.
             
-//TODO CONTINUE CHANGING THE COMPARISON OF VALUES FROM DATES[X] TO COMPAREJSONDATEVALS(DATE[X], DATE[Y], VALCOL) FROM HERE DOWNWARDS
-
             //Median of Three Approach: Check 3 values find median and use that value as index for pivot
                 //Calculate the median value out of indecies 0, N/2, N - 6 Possible condiitons: a b c || a c b || c b a || b c a || c a b || b a c	
                 // Checks conditions where a is smaller than b, then check if b smaller than c to determin if abc or acb
@@ -417,10 +415,21 @@
                 }
 
                 //Now have pivot @ index stored with PivotIndex
-                int LPointer = LowerLim, RPointer = UpperLim;
+                int LPointer = LowerLim, RPointer = UpperLim-1;
 
-                
-                // Now order round the pivot....WHile (L pointer <= L pointer)
+                //check if pivot is last elem, if not swap them
+                if(PivotIndex != UpperLim){
+                    cJSON* temp = Dates[PivotIndex];
+                    Dates[PivotIndex] = Dates[UpperLim];
+                    Dates[UpperLim] = temp;
+                }
+
+
+                //Begin to order the Dates with pointers passed....
+                while(LPointer <= RPointer){
+
+                }
+
                 //Swap the pivot with the far right value
                 //Have a pointer on first index and last index -1 (ignore pivot)
                     //if L pointer val > pivot val (Needs changing)
