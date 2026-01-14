@@ -415,7 +415,7 @@
                 }
 
                 //Now have pivot @ index stored with PivotIndex
-                int LPointer = LowerLim, RPointer = UpperLim-1;
+                int LPointer = LowerLim, RPointer = UpperLim-1; //Rpointer is -1 from limit to ignore pivot
 
                 //check if pivot is last elem, if not swap them
                 if(PivotIndex != UpperLim){
@@ -427,28 +427,40 @@
 
                 //Begin to order the Dates with pointers passed....
                 while(LPointer <= RPointer){
+                    if(CompareJSONDateVals(Dates[LPointer], Dates[PivotIndex], ValCol) > 0){ //Is LPointer > Pivot Val (needs changing)
+                        if(CompareJSONDateVals(Dates[RPointer], Dates[PivotIndex], ValCol) < 0){ //Is Right value < pointer value (needs changing)
+                            //Swap the pair round
+                            cJSON* temp = Dates[RPointer];
+                            Dates[RPointer] = Dates[LPointer];
+                            Dates[LPointer] = temp;
 
-                }
-
-                //Swap the pivot with the far right value
-                //Have a pointer on first index and last index -1 (ignore pivot)
-                    //if L pointer val > pivot val (Needs changing)
-                        // if R pointer val < pivot val (Needs changing)
-                            // swap pointer values
-                            // shift R by -1, L by +1
-                        // else just move R and wait until a pair of misfits found 
-                            // shift R pointer -1
-                    //else
-                        //shift L pointer by +1 (doesnt need changing, wont swap so doesnt need to keep value)
-                        //if R pointer val > pivot val (doesnt need changing so move pointer)
-                            //shift R pointer by -1
+                            //Shift pointers to next value
+                            RPointer--;
+                            LPointer++;
+                        }
+                        else{ //Just move RPointer and wait for the RPointer to find a misfit to swap
+                            RPointer--;
+                        }
+                    }
+                    else{
+                        LPointer++; //Shift pointer along by one - doestn need changing so dont need to keep looking at val
+                        //if R pointer val > pivot val 
+                        if(CompareJSONDateVals(Dates[RPointer], Dates[PivotIndex], ValCol) > 0) //Value Doesnt need changing, so move pointer
+                            {//shift R pointer by -1
+                                RPointer--;
+                            }   
                         // (else needs to swap but cant becuase L doesnt so keep pointer the same)
-            //Ordering done, the pivots are now the same or have "swapped" sides
-            //Put the value in L at upper index
-            //Put pivot at L (using temp value to not overwrite values)
-            //recursive call twice:
-                //QuickSortDates(LowerLim, L-1) 
-                //QuickSortDates(L+1, UpperLim) DONT USE R becuase what if L==R???
+                    }
+                
+                }
+                //Ordering done, now tneed to place pivot in place.
+                //LPointer points at value that is bigger than the pivot so swap this with pivot which is at the upper index.    
+                cJSON* temp = Dates[UpperLim];
+                Dates[UpperLim] = Dates[LPointer]; //Putes LPointer val on right side
+                Dates[LPointer] = temp;            //Puts Pivot in place
+                //Recursive call on remaining sectinos of list
+                QuickSortDates(LowerLim, LPointer-1, Dates, ValCol); //LPointer, just swaped the last "bigger than pivot" with the far right elem (pivot), so Lpointer points at pivot. So do one less than pivot
+                QuickSortDates(LowerLim, LPointer+1, Dates, ValCol); //As LPointer points at pivot, use the next obj in array as the lower lim.
                 
             
                 
