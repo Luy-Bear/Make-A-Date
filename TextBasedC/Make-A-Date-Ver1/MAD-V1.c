@@ -348,6 +348,7 @@
                     QuickSortDates(0, array_size-1, Dates, order_field_int); 
 
                 // TODO Check order direction and flip array if needed for DESC (like flag flipping section) - means just one print function called after
+                    
                 }
                 // ....if no order specified skip the if statement above and just print out in order it is read in
                 
@@ -422,6 +423,7 @@
                     cJSON* temp = Dates[PivotIndex];
                     Dates[PivotIndex] = Dates[UpperLim];
                     Dates[UpperLim] = temp;
+                    PivotIndex = UpperLim; //AFTER MOVING PIVOT TO FAR RIGHT, ADJUST PIVOT INDEX TO REFLECT THIS!!
                 }
 
 
@@ -460,7 +462,7 @@
                 Dates[LPointer] = temp;            //Puts Pivot in place
                 //Recursive call on remaining sectinos of list
                 QuickSortDates(LowerLim, LPointer-1, Dates, ValCol); //LPointer, just swaped the last "bigger than pivot" with the far right elem (pivot), so Lpointer points at pivot. So do one less than pivot
-                QuickSortDates(LowerLim, LPointer+1, Dates, ValCol); //As LPointer points at pivot, use the next obj in array as the lower lim.
+                QuickSortDates(LPointer+1, UpperLim, Dates, ValCol); //As LPointer points at pivot, use the next obj in array as the lower lim.
                 
             
                 
