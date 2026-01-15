@@ -188,6 +188,7 @@
                     }
                 }
 
+                
                 // Display what was parsed
                 if(filter_field == 'i'){printf("Filter In fields: ");}
                 else if(filter_field == 'o'){printf("Filter Out fields: ");}
@@ -258,6 +259,7 @@
 
                 // Get array size for loop
                 int array_size = cJSON_GetArraySize(json);
+                
                 printf("Found %d dates...\n\n", array_size);
 
 
@@ -275,6 +277,7 @@
                     }
                 }
                 else{
+                    
                     //Loop through all filter fields and uses an if else str compare ladder to set column flags
                     for(int i=0; i< filter_count; i++){
                         //Uses more mem short term but speeds up copmuting bu uppercasing once rather than several times
@@ -305,6 +308,7 @@
                     }
                 }
                 
+                
                 //If user species to filter out, flip flags
                 if(filter_field=='o'){
                     for (int i = 0; i < 6; i++) {
@@ -332,9 +336,11 @@
                     cJSON *Date = cJSON_GetArrayItem(json, i);
                     Dates[i] = Date;
                 }
-
+                
                 // If user specifies a col to order by, order it in place in Dates arr and then print it using quick sort ...
-                if(order_field != NULL){    
+                if(order_field != NULL){        
+                          
+    
                     //Check what col to order by to pass into helper function to compare values of dates
                     if(strcmp(order_field, "ID") == 0) order_field_int = ID;
                     else if(strcmp(order_field, "IDEA") == 0) order_field_int = IDEA;
@@ -343,16 +349,24 @@
                     else if(strcmp(order_field, "DATE") == 0) order_field_int = DATE;
                     else if(strcmp(order_field, "LOCATION") == 0) order_field_int = LOCATION;
                     else if(strcmp(order_field, "NOTES") == 0) order_field_int = NOTES;
+                    else {
+                        // Invalid column name, exit program
+                        fprintf(stderr, "Error: '%s' is not a valid column name for ordering\n", order_field);
+                        fprintf(stderr, "Valid columns: ID, IDEA, TYPE, SEASONAL, DATE, LOCATION, NOTES\n");
+                        free(Dates);
+                        cJSON_Delete(json);
+                        exit(EXIT_FAILURE);
+                    }
+                    
                     
                 //TODO Implement quick sort as a recursive function
                     QuickSortDates(0, array_size-1, Dates, order_field_int); 
+                    
 
                 // TODO Check order direction and flip array if needed for DESC (like flag flipping section) - means just one print function called after
                     
                 }
                 // ....if no order specified skip the if statement above and just print out in order it is read in
-                
-                
                 PrintJSONObjs(FlagArr, Dates, array_size, order_direction);
                 free(Dates);
                 cJSON_Delete(json);
@@ -582,10 +596,84 @@
     }
 
     void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums, char* order_direction){
-        
+        // Set default direction if not specified
+        if(order_direction == NULL) {
+            order_direction = "ASC";
+        }
+
         int Descending = (strcmp(order_direction, "DESC") == 0); //if order direction is DESC, strcmp returns 0, Descending becomes true (1) 
         int i = Descending ? (DateNums-1) : 0; //If descending is true i is max index of dates to count in reverse, else it is 0 ready to count up 
+
+        // PRINT COLUMN HEADERS
         
+        //this is for dynamic separator printing
+        int columns_printed = 0;
+        int separator_length = 10;  // "Idea XXX: " is 10 chars wide
+        
+        printf("Idea ID | ");
+        
+        if(FlagArr[0]) {
+            char *formatted = ReturnStrXLength(IDEA_WIDTH, "IDEA");
+            printf("%s | ", formatted);
+            free(formatted);
+            columns_printed++;
+            separator_length += IDEA_WIDTH;
+        }
+        
+        if(FlagArr[1]) {
+            char *formatted = ReturnStrXLength(TYPE_WIDTH, "TYPE");
+            printf("%s | ", formatted);
+            free(formatted);
+            columns_printed++;
+            separator_length += TYPE_WIDTH;
+        }
+        
+        if(FlagArr[2]) {
+            char *formatted = ReturnStrXLength(SEASONAL_WIDTH, "SEASONAL");
+            printf("%s | ", formatted);
+            free(formatted);
+            columns_printed++;
+            separator_length += SEASONAL_WIDTH;
+        }
+        
+        if(FlagArr[3]) {
+            char *formatted = ReturnStrXLength(DATE_WIDTH, "DATE");
+            printf("%s | ", formatted);
+            free(formatted);
+            columns_printed++;
+            separator_length += DATE_WIDTH;
+        }
+        
+        if(FlagArr[4]) {
+            char *formatted = ReturnStrXLength(LOCATION_WIDTH, "LOCATION");
+            printf("%s | ", formatted);
+            free(formatted);
+            columns_printed++;
+            separator_length += LOCATION_WIDTH;
+        }
+        
+        if(FlagArr[5]) {
+            char *formatted = ReturnStrXLength(NOTES_WIDTH, "NOTES");
+            printf("%s", formatted);  // No " | " at the end
+            free(formatted);
+            columns_printed++;
+            separator_length += NOTES_WIDTH;
+        }
+
+        printf("\n");
+        // Print separator line dynamically
+
+        if(columns_printed > 0) {
+            separator_length += (columns_printed - 1) * 3;  // " | " separators
+        }
+
+        for(int j = 0; j < separator_length; j++) {
+            printf("─");
+        }
+        printf("\n");
+
+
+
         //if decending true, check if i >= 0, otherwise check if it is max index or below)
         while(Descending ?(i>= 0) : (i<DateNums)){
             cJSON *Date = Dates[i];
