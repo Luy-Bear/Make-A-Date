@@ -70,7 +70,7 @@
     
 
     //print JSON function
-    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums);
+    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums, char *order_direction);
 
     
     int main(int argc, char *argv[]){
@@ -353,7 +353,7 @@
                 // ....if no order specified skip the if statement above and just print out in order it is read in
                 
                 
-                PrintJSONObjs(FlagArr, Dates, array_size);
+                PrintJSONObjs(FlagArr, Dates, array_size, order_direction);
                 free(Dates);
                 cJSON_Delete(json);
 
@@ -581,8 +581,13 @@
         return(cJSON_GetObjectItemCaseSensitive(JSON, "Notes")->valuestring);
     }
 
-    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums){
-        for(int i = 0; i<DateNums; i++){
+    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums, char* order_direction){
+        
+        int Descending = (strcmp(order_direction, "DESC") == 0); //if order direction is DESC, strcmp returns 0, Descending becomes true (1) 
+        int i = Descending ? (DateNums-1) : 0; //If descending is true i is max index of dates to count in reverse, else it is 0 ready to count up 
+        
+        //if decending true, check if i >= 0, otherwise check if it is max index or below)
+        while(Descending ?(i>= 0) : (i<DateNums)){
             cJSON *Date = Dates[i];
             if (Date != NULL) {
                 // Always print the FORMATTED ID
@@ -629,6 +634,8 @@
                 }
                 
                 printf("\n");
+                // if descending add -1 to i, else add 1
+                i += Descending ? -1 : 1;
             }
         }
     }
