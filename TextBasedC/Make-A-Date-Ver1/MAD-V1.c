@@ -88,9 +88,10 @@
                 char *order_field = NULL;
                 int order_field_int = -1;
                 char *order_direction = NULL;
+                char *HasVal = NULL;
                 optind =2; //Option index
 
-                // Define long options
+                // Define long options: Can change first arg to be command line, lat arguemnt is the case select option
                 struct option long_options[] = {
                     {"fi", required_argument, 0, 'i'},
                     {"fo", required_argument, 0, 'o'},
@@ -104,7 +105,7 @@
                 int DoulbeFilterFlag = 0;
 
                 // Parse filter arguments and options
-                // opt will check letter by letter for -f and/or -o,if unkown option found (e.g -z) defualt is hit, if nothing else to check -1 returned 
+                // opt will check letter by letter for --fi or --fo and/or --or and/or has and --or --in unkown option found (e.g -z) defualt is hit, if nothing else to check -1 returned 
                 while ((opt = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
                     switch (opt) {
                         //If it finds fi it will...
@@ -150,8 +151,6 @@
                             order_field = StrToUpper(optarg);
                             // if there are more options, and theyre not a flag
                             if (optind < argc && argv[optind][0] != '-') {// take argumnet as direction but only if ASC or DESC (works for EVERYTHING)
-                                //Storing order direction as a varialbe becuase i will use it later on probably 
-
                                 // strcmp returns 0 if string are identical, <0 if str1 comes before alphabetically and >0 if str1 comes after str 2 alphabetically 
                                 if(strcmp((StrToUpper(argv[optind])), "ASC") == 0 || strcmp((argv[optind]), "DESC") == 0){
                                     order_direction = StrToUpper(argv[optind]);
@@ -166,18 +165,21 @@
                             break;
                         
                         case 'h':
-                            //When user has --has argument flag it will only print out the values where the argument after is found inside the date
-                            printf("\n\n HAS DETECTED \n\n");
-                            // STORE WHAT SEARCH VALUE IS IN A VAR (PLACE THESE OUTSIDE)
-                                // char *has_search_term = NULL;
-                                // char *has_search_column = NULL;
-                            //  has_search_term = optarg;  // Store "coffee"
-
-                            //Later when filtering dates, check if the term exists
+                            //When user has --has argument flag it will accept the first value after the option INBETWEEN SPEECH MARCHS
+                                //i.e: '"word1 word2 ..... wordx"' but not 'word1 word2 ... wordx'
+                            HasVal = optarg;
+                            // Check for extra arguments (error case)
+                            if (optind < argc && argv[optind][0] != '-') {
+                                fprintf(stderr, "Error: Unexpected argument '%s' after --has\n", argv[optind]);
+                                fprintf(stderr, "Did you forget quotes? Use: --has \"word1 word2 ... wordx\"\n");
+                                exit(EXIT_FAILURE);
+                            }
                             break;
 
                         case 'n': //These is if user puts "in" in the arguemnts
                                 // has_search_column = StrToUpper(optarg);  // Store "TYPE"
+                                // char *has_search_column = NULL;
+                    
                             break;
 
                         default:
