@@ -336,6 +336,10 @@
                 //Adds all the JSON elements into Dates array
                 for(int i = 0; i < array_size; i++) {
                     cJSON *Date = cJSON_GetArrayItem(json, i);
+
+// TODO: ADD CONDITIONAL CHECK TO SEE IF --HAS CONTAINS ARGUMENTS AND THEN SPECIFICALLY IF IN A SPECIFIC COL! HERE. IF SO DATES[I] = DATE
+// Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
+
                     Dates[i] = Date;
                 }
                 
