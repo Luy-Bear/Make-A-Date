@@ -15,12 +15,12 @@ I personally required this problem solved and I can only imagine other too, I to
 To do this, the plan was to develop a local text based solution in C, found in the repo under “TextBasedC”. This was a proof of concept that allowed me to better understand the challenges this project had. 
 
 This solution, which is currently a work in progress, is fully local and command line based. As of writing it:
-- [X] reads from a JSON file
-- [X] Prints out objects 
-- [X] Prints user chosen fields in a specific format
-- [X] Orders based on user chosen field 
-  - [X] in ascending 
-  - [X] in descending order
+- [x] reads from a JSON file
+- [x] Prints out objects 
+- [x] Prints user chosen fields in a specific format
+- [x] Orders based on user chosen field 
+  - [x] in ascending 
+  - [x] in descending order
   - [ ] Deals with special case for string calendar date formats
 - [ ] Searches for user inputted text
   - [ ] can look if desired in specific attributes only
