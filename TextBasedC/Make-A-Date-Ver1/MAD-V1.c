@@ -70,12 +70,12 @@
     
 
     //print JSON function
-    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums, char *order_direction);
+    void PrintJSONObjs(int FilterFlagArr[], cJSON *Dates[], int DateNums, char *order_direction);
 
     
     int main(int argc, char *argv[]){
         //Argc argument counter, arv is argument vector, array of char pointers listing all args
-       
+       printf("\n");
         //If there are command line arguments - run, else quit
         if(argc > 1){
             // Check if read or write
@@ -103,6 +103,9 @@
 
                 // Flag to check f user called both filter options at once
                 int DoulbeFilterFlag = 0;
+
+                //--Has and --In Vars
+                int InColFlagArr[6] ={0,0,0,0,0,0}; //Makes 6 flags for all columns - ID not searchable, also initialise at 0 to remove garbage data.
 
                 // Parse filter arguments and options
                 // opt will check letter by letter for --fi or --fo and/or --or and/or has and --or --in unkown option found (e.g -z) defualt is hit, if nothing else to check -1 returned 
@@ -162,6 +165,7 @@
                                     exit(EXIT_FAILURE);
                                 }
                             } 
+                            printf("\n");
                             break;
                         
                         case 'h':
@@ -174,14 +178,51 @@
                                 fprintf(stderr, "Did you forget quotes? Use: --has \"word1 word2 ... wordx\"\n");
                                 exit(EXIT_FAILURE);
                             }
+                            printf("Searching for %s \n", HasVal);
+                            printf("\n");
                             break;
 
-                        case 'n': //These is if user puts "in" in the arguemnts
-                                // has_search_column = StrToUpper(optarg);  // Store "TYPE"
-                                // char *has_search_column = NULL;
-                    
-                            break;
+                        case 'n':{ //These is if user puts "in" in the arguemnts
+                            // Valid column names
+                            const char* valid_cols[] = {"IDEA", "TYPE", "SEASONAL", "DATE", "LOCATION", "NOTES"};
+                            
+                            // Process first column (from optarg)
+                            char* col = StrToUpper(optarg);
+                            for(int i = 0; i < 6; i++) {
+                                if(strcmp(col, valid_cols[i]) == 0) {
+                                    InColFlagArr[i] = 1;
+                                    break;
+                                }
+                                if(i==5){printf("Invalid column name for 'in' argument: '%s'\n", optarg);}
+                            }
+                            
+                            // Process additional columns
+                            while(optind < argc && argv[optind][0] != '-') {
+                                col = StrToUpper(argv[optind]);
+                                for(int i = 0; i < 6; i++) {
+                                    if(strcmp(col, valid_cols[i]) == 0) {
+                                        InColFlagArr[i] = 1;
+                                        break;
+                                    }
+                                    if(i==5){printf("Invalid column namefor 'in' argument: : '%s'\n", argv[optind]);}
+                                }
+                                optind++;
+                            }
+                            printf("\n");
+                            printf("The following columns will be searched, if valid has argument given: ");
+                            const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
 
+                            int first = 1;
+                            for(int i = 0; i < 6; i++) {
+                                if(InColFlagArr[i]) {
+                                    if(!first) printf(", ");
+                                    printf("%s", display_names[i]);
+                                    first = 0;
+                                }
+                            }
+                            printf("\n\n");
+                            break;
+                        }
                         default:
                             // if another flag found its wrong - return error message and exit
                             fprintf(stderr, "Usage: %s -f(i|o) field1 [field2...] -Or field [asc|desc]\n", 
@@ -262,20 +303,21 @@
                 // Get array size for loop
                 int array_size = cJSON_GetArraySize(json);
                 
-                printf("Found %d dates...\n\n", array_size);
+                printf("Found %d dates...\n", array_size);
+                printf("____________________________________________________________________________\n\n\n\n");
 
 
                 // Filter Flag Logic - Takes user filters and sets up flags for future use
                 // [0    1    2        3    4        5    ]
                 // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
 
-                int FlagArr[6]={0}; //Makes 6 flags for all columns - ID not filterable, also initialise at 0 to remove garbage data.
+                int FilterFlagArr[6]={0}; //Makes 6 flags for all columns - ID not filterable, also initialise at 0 to remove garbage data.
 
                 //If not filter specified print eveyrthing so set flag values to 1
                 if(filter_field == '\0'){
                     //Set flag values to 1
                     for (int i = 0; i < 6; i++) {
-                        FlagArr[i] = 1;
+                        FilterFlagArr[i] = 1;
                     }
                 }
                 else{
@@ -287,22 +329,22 @@
 
                         //If the uppercase string == column X, set flag X to 1. Array index adjusted as not doing IDs but ordering i will so need 0 to be id therefore offsetting vals in this case
                         if(strcmp(upper, "IDEA") == 0) {
-                            FlagArr[IDEA-1] = 1;
+                            FilterFlagArr[IDEA-1] = 1;
                         }
                         else if(strcmp(upper, "TYPE") == 0) {
-                            FlagArr[TYPE-1] = 1;
+                            FilterFlagArr[TYPE-1] = 1;
                         }
                         else if(strcmp(upper, "SEASONAL") == 0) {
-                            FlagArr[SEASONAL-1] = 1;
+                            FilterFlagArr[SEASONAL-1] = 1;
                         }
                         else if(strcmp(upper, "DATE") == 0) {
-                            FlagArr[DATE-1] = 1;
+                            FilterFlagArr[DATE-1] = 1;
                         }
                         else if(strcmp(upper, "LOCATION") == 0) {
-                            FlagArr[LOCATION-1] = 1;
+                            FilterFlagArr[LOCATION-1] = 1;
                         }
                         else if(strcmp(upper, "NOTES") == 0) {
-                            FlagArr[NOTES-1] = 1;
+                            FilterFlagArr[NOTES-1] = 1;
                         }
                         else{
                             printf("User input of '%s' not found\n", filter_fields[i]);
@@ -314,7 +356,7 @@
                 //If user species to filter out, flip flags
                 if(filter_field=='o'){
                     for (int i = 0; i < 6; i++) {
-                        FlagArr[i] = !(FlagArr[i]);
+                        FilterFlagArr[i] = !(FilterFlagArr[i]);
                     }
                 }
 
@@ -337,9 +379,15 @@
                 for(int i = 0; i < array_size; i++) {
                     cJSON *Date = cJSON_GetArrayItem(json, i);
 
-// TODO: ADD CONDITIONAL CHECK TO SEE IF --HAS CONTAINS ARGUMENTS AND THEN SPECIFICALLY IF IN A SPECIFIC COL! HERE. IF SO DATES[I] = DATE
+// TODO: ADD CONDITIONAL CHECK TO SEE IF --HAS CONTAINS ARGUMENTS AND THEN SPECIFICALLY IF IN A SPECIFIC COL! HERE. IF SO DATES[I] = DATE]
+// TODO: CHECK FOR NO HAS BUT THERE IS AN IN
 // Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
+                    //Switch case statement based on In Flag (InColFlag - Int value, using consts)
+                    //Inside every case theres an if statement checking if contents of JSON attr == Has Arg, if true
 
+                    
+                    
+                        // Add to Dates
                     Dates[i] = Date;
                 }
                 
@@ -365,15 +413,12 @@
                     }
                     
                     
-                //TODO Implement quick sort as a recursive function
+                //Implemented quick sort fn as a recursive function
                     QuickSortDates(0, array_size-1, Dates, order_field_int); 
-                    
-
-                // TODO Check order direction and flip array if needed for DESC (like flag flipping section) - means just one print function called after
                     
                 }
                 // ....if no order specified skip the if statement above and just print out in order it is read in
-                PrintJSONObjs(FlagArr, Dates, array_size, order_direction);
+                PrintJSONObjs(FilterFlagArr, Dates, array_size, order_direction);
                 free(Dates);
                 cJSON_Delete(json);
 
@@ -601,7 +646,7 @@
         return(cJSON_GetObjectItemCaseSensitive(JSON, "Notes")->valuestring);
     }
 
-    void PrintJSONObjs(int FlagArr[], cJSON *Dates[], int DateNums, char* order_direction){
+    void PrintJSONObjs(int FilterFlagArr[], cJSON *Dates[], int DateNums, char* order_direction){
         // Set default direction if not specified
         if(order_direction == NULL) {
             order_direction = "ASC";
@@ -618,7 +663,7 @@
         
         printf("Idea ID | ");
         
-        if(FlagArr[0]) {
+        if(FilterFlagArr[0]) {
             char *formatted = ReturnStrXLength(IDEA_WIDTH, "IDEA");
             printf("%s | ", formatted);
             free(formatted);
@@ -626,7 +671,7 @@
             separator_length += IDEA_WIDTH;
         }
         
-        if(FlagArr[1]) {
+        if(FilterFlagArr[1]) {
             char *formatted = ReturnStrXLength(TYPE_WIDTH, "TYPE");
             printf("%s | ", formatted);
             free(formatted);
@@ -634,7 +679,7 @@
             separator_length += TYPE_WIDTH;
         }
         
-        if(FlagArr[2]) {
+        if(FilterFlagArr[2]) {
             char *formatted = ReturnStrXLength(SEASONAL_WIDTH, "SEASONAL");
             printf("%s | ", formatted);
             free(formatted);
@@ -642,7 +687,7 @@
             separator_length += SEASONAL_WIDTH;
         }
         
-        if(FlagArr[3]) {
+        if(FilterFlagArr[3]) {
             char *formatted = ReturnStrXLength(DATE_WIDTH, "DATE");
             printf("%s | ", formatted);
             free(formatted);
@@ -650,7 +695,7 @@
             separator_length += DATE_WIDTH;
         }
         
-        if(FlagArr[4]) {
+        if(FilterFlagArr[4]) {
             char *formatted = ReturnStrXLength(LOCATION_WIDTH, "LOCATION");
             printf("%s | ", formatted);
             free(formatted);
@@ -658,7 +703,7 @@
             separator_length += LOCATION_WIDTH;
         }
         
-        if(FlagArr[5]) {
+        if(FilterFlagArr[5]) {
             char *formatted = ReturnStrXLength(NOTES_WIDTH, "NOTES");
             printf("%s", formatted);  // No " | " at the end
             free(formatted);
@@ -691,37 +736,37 @@
                 // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
                 //Checks flags to print text
                 
-                if(FlagArr[0]) {
+                if(FilterFlagArr[0]) {
                     char *formatted = ReturnStrXLength(IDEA_WIDTH, ReturnJsonIdea(Date));
                     printf("%s | ", formatted);
                     free(formatted);
                 }
                 
-                if(FlagArr[1]) {
+                if(FilterFlagArr[1]) {
                     char *formatted = ReturnStrXLength(TYPE_WIDTH, ReturnJsonType(Date));
                     printf("%s | ", formatted);
                     free(formatted);
                 }
                 
-                if(FlagArr[2]) {
+                if(FilterFlagArr[2]) {
                     char *formatted = ReturnStrXLength(SEASONAL_WIDTH, ReturnJsonSeasonal(Date));
                     printf("%s | ", formatted);
                     free(formatted);
                 }
                 
-                if(FlagArr[3]) {
+                if(FilterFlagArr[3]) {
                     char *formatted = ReturnStrXLength(DATE_WIDTH, ReturnJsonDate(Date));
                     printf("%s | ", formatted);
                     free(formatted);
                 }
                 
-                if(FlagArr[4]) {
+                if(FilterFlagArr[4]) {
                     char *formatted = ReturnStrXLength(LOCATION_WIDTH, ReturnJsonLocation(Date));
                     printf("%s | ", formatted);
                     free(formatted);
                 }
                 
-                if(FlagArr[5]) {
+                if(FilterFlagArr[5]) {
                     char *formatted = ReturnStrXLength(NOTES_WIDTH, ReturnJsonNotes(Date));
                     printf("%s", formatted);  // No " | " at the end
                     free(formatted);
