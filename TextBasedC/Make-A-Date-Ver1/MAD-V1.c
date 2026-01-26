@@ -209,15 +209,24 @@
                                 optind++;
                             }
                             printf("\n");
-                            printf("The following columns will be searched, if valid has argument given: ");
-                            const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
+                            if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) == 0){
+                                for(int i = 0; i < 6; i++) {
+                                    InColFlagArr[i] = 1;
+                                }
+                                printf("No valid columns found, defaulting to search all columns if required");
+                            }
+                            else{
+                                printf("The following columns will be searched, if valid has argument given: ");
 
-                            int first = 1;
-                            for(int i = 0; i < 6; i++) {
-                                if(InColFlagArr[i]) {
-                                    if(!first) printf(", ");
-                                    printf("%s", display_names[i]);
-                                    first = 0;
+                                const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
+
+                                int first = 1;
+                                for(int i = 0; i < 6; i++) {
+                                    if(InColFlagArr[i]) {
+                                        if(!first) printf(", ");
+                                        printf("%s", display_names[i]);
+                                        first = 0;
+                                    }
                                 }
                             }
                             printf("\n\n");
@@ -380,7 +389,10 @@
                     cJSON *Date = cJSON_GetArrayItem(json, i);
 
 // TODO: ADD CONDITIONAL CHECK TO SEE IF --HAS CONTAINS ARGUMENTS AND THEN SPECIFICALLY IF IN A SPECIFIC COL! HERE. IF SO DATES[I] = DATE]
-// TODO: CHECK FOR NO HAS BUT THERE IS AN IN
+                    if(HasVal != NULL){
+                        
+                    }
+                    
 // Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
                     //Switch case statement based on In Flag (InColFlag - Int value, using consts)
                     //Inside every case theres an if statement checking if contents of JSON attr == Has Arg, if true
