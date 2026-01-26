@@ -1,10 +1,11 @@
 # Make A Date C Implementation README
 
-This implementation specifically is mostly in the standard C library, the only external library it uses is [LINK TO THE JSON PARSER]. To build the assembled code run download the library and you can compile with the following command line [INSERT COMMAND LINE].
+This implementation specifically is mostly in the standard C library, the only external library it uses is [Dave Gambles cJSON Praser](https://github.com/DaveGamble/cJSON). To build the assembled code run download the library and you can compile with the following command line `gcc MAD-V1.c -o NAME -lcjson`
 
-Once compiled, you as the user have various ways of using the application. The two main ways are reading and writing to the JSON file.
+Once compiled, you as the user have various ways of using the application. The two main ways are [Reading](#Reading) and [Writing](#Writing) to the JSON file.
 
 --- 
+
 ## Operations
 ### Reading
 To read the JSON file stored in the same directory as the compiled code run the following command (it is case insensitive):
@@ -13,22 +14,22 @@ To read the JSON file stored in the same directory as the compiled code run the 
 ```
 This will read the entire JSON file in its intierty, and print out every piece of information as follows...
 
-[IMAGE of ./MAD-V1 read]
-
-
+![Image-of-reading-arg](ReadMePhotos/READ.png)
 
 ### Filtering
-To specify if you would like to **F**ilter **i**n or **F**ilter **o**ut, you can use the arguments `—fi` or `—fo` **but not both!** These allow you to select what columns you would like to see.
+To specify if you would like to **F**ilter **i**n or **F**ilter **o**ut, you can use the arguments `--fi` or `--fo` **but not both!** These allow you to select what columns you would like to see.
 
 ``` bash
-    ./NAME -fi Idea daTE TyPe
+    ./NAME read --fi Idea daTE TyPe
 ```
-[IMAGE-OF-./MAD-V1--fi-Idea-daTE-TyPe]
+![Image-of-filtering-arg](ReadMePhotos/FilterIn.png)
+
+Same can be achieved by filtering out! as follows, notice the additional headings in arguments
 
 ``` bash
-    ./NAME -fo Idea daTE TyPe
+    ./NAME read --fo Idea daTE TyPe
 ```
-[IMAGE-OF-./MAD-V1--fo-Idea-daTE-TyPe]
+![Image-of-filter-arg](ReadMePhotos/FilterOut.png)
 
 
 They take a list of column names, in any order and any case, as their arguments seperated by spaces e.g `name date type`. Any columns not found, i.e arguments with an invalid name, will not throw an error. The program will run and print the result but will warn the uer which columns were not found. The IDs will always be printed no matter what.
@@ -41,19 +42,19 @@ Make-A-Date allows the user to print the output in a specified output for any co
 The user can requeset the order to be **asc**ending or **desc**ending by following the `--or` flag with `ASC` or `DESC` after the chosen column, however if nothing is specified it automtically defaults to ascending.
 
 ``` bash
-    ./NAME -fi idea --or idea ASC
+    ./NAME read --fi idea --or idea ASC
 ```
-[IMAGE-ORDERING-IDEA-BY-IDEA-ASC]
+![OrderingIdeaByIdeaAsc](ReadMePhotos/OrderingIdeaByIdeaASC.png)
 
 ``` bash
-    ./NAME -fi idea --or id desc
+    ./NAME read --fi idea --or idea desc
 ```
-[IMAGE-ORDERING-IDEA-BY-ID-DESC]
+![OrderingIdeaByIdeaDesc](ReadMePhotos/OrderingIdeaByIdeaDESC.png)
 
 ``` bash
-    ./NAME -fi idea --or id 
+    ./NAME read --fi idea --or id 
 ```
-[IMAGE-ORDERING-IDEA-BY-DEFAULT]
+![IMAGE-ORDERING-IDEA-BY-DEFAULT](ReadMePhotos/OrderingByIdeaDefault.png)
 
 #### Date Syntax
 The Date format is a little differet. Due to the limitations of C and my own preference - it is stored and treated as a string value. This allows for Date plans that are seasnoal or an annual event to be stored using X as a place holder. For example a pumkin carving date during halloween can be repreesnted as "X/10/X".
@@ -72,7 +73,7 @@ For example, if a user wanted to return all dates that involve "coffee" or "happ
 This input must be surrounded by `"`s and is case sensitive and [WIP????] must match exactly to what is found, so "has happy hour" and "happy hour" will not match.
 
 ```bash
-    ./NAME --has "coffee"
+    ./NAME read --has "coffee"
 ```
 [IMAGE-OF-HAS-COFFEE]
 
@@ -85,11 +86,11 @@ This limit in the search area not only allows for faster speeds when searching l
 The option must be followed by a correctly spelt column name and will only accept multiple column names to better customise the search criteria.
 
 ```bash
-    ./Name --has "Coffee" --in name
+    ./Name read --has "Coffee" --in name
 ```
 
 ```bash
-    ./Name --has "Coffee" --in name notes
+    ./Name read --has "Coffee" --in name notes
 ```
 
 ### Constants/Definitions
@@ -107,3 +108,5 @@ At the top in constants the user will find the following:
 ```
 
 These values are hard coded constants that allow the character width limits to be changed for each adn every column. For example, if the user didnt want to occupy the width of their screen with notes due to techincal limitations or preference, they can reduce the notes width, and where the notes would have overflown the program adds a "..." to signify it is wider than it is allowed to be.
+
+### Writing
