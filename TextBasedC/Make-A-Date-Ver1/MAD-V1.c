@@ -46,6 +46,7 @@
     #define LOCATION 5
     #define NOTES 6
 
+    int DateHas(char* HasVal, int* InColFlagArr, cJSON*  Date);
 
     //Uses quick sort to sort dates into order
     void QuickSortDates(int Lower, int Upper, cJSON* Dates[], int ValCol);
@@ -178,7 +179,7 @@
                                 fprintf(stderr, "Did you forget quotes? Use: --has \"word1 word2 ... wordx\"\n");
                                 exit(EXIT_FAILURE);
                             }
-                            printf("Searching for %s \n", HasVal);
+                            printf("Searching for %s", HasVal);
                             printf("\n");
                             break;
 
@@ -209,13 +210,9 @@
                                 optind++;
                             }
                             printf("\n");
-                            if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) == 0){
-                                for(int i = 0; i < 6; i++) {
-                                    InColFlagArr[i] = 1;
-                                }
-                                printf("No valid columns found, defaulting to search all columns if required");
-                            }
-                            else{
+                            //If all the flags are set to 0, user still wants to search something potentially so set flags all to 1 to search whole obj not specific col
+                            if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
+                                //Else tell the user what cols are valid and are going to be searched
                                 printf("The following columns will be searched, if valid has argument given: ");
 
                                 const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
@@ -229,7 +226,6 @@
                                     }
                                 }
                             }
-                            printf("\n\n");
                             break;
                         }
                         default:
@@ -238,6 +234,15 @@
                                     argv[0]);
                             exit(EXIT_FAILURE);
                     }
+                }
+
+                //Once all arguemnts parsed, check if no --in columns specified BUT ALSO --has value specified - in that case, print eveything 
+                if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) == 0 && HasVal != NULL){
+                    for(int i = 0; i < 6; i++) {
+                        InColFlagArr[i] = 1;
+                    }
+                    printf("No valid columns found, defaulting to search all columns");
+                    printf("\n");
                 }
 
                 
@@ -384,25 +389,32 @@
                     exit(EXIT_FAILURE);
                 }
 
+                int actual_count = 0;  // Compact array counter (no gaps)
+
                 //Adds all the JSON elements into Dates array
-                for(int i = 0; i < array_size; i++) {
+                for(int i = 0; i < cJSON_GetArraySize(json); i++) {
+                    // printf(".\n");
                     cJSON *Date = cJSON_GetArrayItem(json, i);
-
-// TODO: ADD CONDITIONAL CHECK TO SEE IF --HAS CONTAINS ARGUMENTS AND THEN SPECIFICALLY IF IN A SPECIFIC COL! HERE. IF SO DATES[I] = DATE]
+                    //If there is a value to search....
                     if(HasVal != NULL){
-                        
+                        //Flags are either all set to 1 or select few, pass flag array into helper function
+                        if(DateHas(HasVal, InColFlagArr, Date)){ //TODO: Make DateHas fn, return true/false if Date hasq3 HasVal in columns specified 
+                            // if found, add to dates using actual_count (creates compact array with no gaps)
+                            Dates[actual_count] = Date;
+                            actual_count++;
+                        }
+                        //else skip and do nothing, so Dates only has Dates with correct search value in them
+                        // printf("bah\n");
                     }
-                    
-// Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
-                    //Switch case statement based on In Flag (InColFlag - Int value, using consts)
-                    //Inside every case theres an if statement checking if contents of JSON attr == Has Arg, if true
-
-                    
-                    
-                        // Add to Dates
-                    Dates[i] = Date;
+                    else{
+                        Dates[actual_count] = Date;
+                        actual_count++;
+                    }
                 }
-                
+
+                // Update array_size to reflect actual number of dates added (not total JSON items)
+                array_size = actual_count;                
+
                 // If user specifies a col to order by, order it in place in Dates arr and then print it using quick sort ...
                 if(order_field != NULL){        
                           
@@ -739,6 +751,7 @@
 
         //if decending true, check if i >= 0, otherwise check if it is max index or below)
         while(Descending ?(i>= 0) : (i<DateNums)){
+            // printf("i: %d, Datenums: %d\n", i, DateNums);
             cJSON *Date = Dates[i];
             if (Date != NULL) {
                 // Always print the FORMATTED ID
@@ -785,8 +798,83 @@
                 }
                 
                 printf("\n");
-                // if descending add -1 to i, else add 1
-                i += Descending ? -1 : 1;
             }
+            // if descending add -1 to i, else add 1, placed here incase never add anything to Dates?
+            i += Descending ? -1 : 1;
+            
         }
+    }
+
+    int DateHas(char* HasVal, int* InColFlagArr, cJSON* Date){
+        // Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
+                    //Switch case statement based on In Flag (InColFlag - Int value, using consts)
+                    //Inside every case theres an if statement checking if contents of JSON attr == Has Arg, if true
+
+
+
+        //TODO: ...
+                
+        // Make uppercase copy of search term once - stops in place capitalisation
+        char *search_upper = strdup(HasVal);
+        StrToUpper(search_upper);
+        
+        int found = 0;
+        
+        if(InColFlagArr[0]){
+            char *field_upper = strdup(ReturnJsonIdea(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+        if(InColFlagArr[1]){
+            char *field_upper = strdup(ReturnJsonType(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+        if(InColFlagArr[2]){
+            char *field_upper = strdup(ReturnJsonSeasonal(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+        if(InColFlagArr[3]){
+            char *field_upper = strdup(ReturnJsonDate(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+        if(InColFlagArr[4]){
+            char *field_upper = strdup(ReturnJsonLocation(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+        if(InColFlagArr[5]){
+            char *field_upper = strdup(ReturnJsonNotes(Date));
+            StrToUpper(field_upper);
+            if(strstr(field_upper, search_upper) != NULL){
+                found = 1;
+            }
+            free(field_upper);
+            if(found) { free(search_upper); return 1; }
+        }
+
+
+        return 0;
     }
