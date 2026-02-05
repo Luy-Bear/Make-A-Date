@@ -583,6 +583,7 @@
                 return strcmp(ReturnJsonSeasonal(a), ReturnJsonSeasonal(b));
             
             case DATE:
+                //TODO: ADJUST THIS SO IT FLIPS TO COMPARE YEAR/MONTH/DATE
                 return strcmp(ReturnJsonDate(a), ReturnJsonDate(b));
             
             case LOCATION:
