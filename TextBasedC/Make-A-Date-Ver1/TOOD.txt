@@ -1,13 +1,163 @@
-TODO:
-    Flag Parsing
-        Adjust the flag searching to limit the potential options on read to group/dsc/asc
-        Adjust flag searching to throw error if coloumns arent listed even before printing?
-        Figure out why i can list 100 items args in the flag and it not be an issue with the [10]
+Test Commands:
+#1. Read all dates, all columns
+./MAD-V1 read
+    - Outputs all dates in order, wrapped to length, random order
+    
 
-    Printing Method
-        Now i have a list of columns to include/exclude and order by adjust printing method to print properly and not have mem leaks!
-        Bunch of select case/if statements:
-            - Calls a helper function to generate string of column value
-            - Adjust string for formatting
-            - Then prints row!
+#2. Read with no arguments (should show error)
+./MAD-V1
+    - Success, throws error message
 
+#3. Write with no arguments
+./MAD-V1 write
+    - TODO implement this and other write functions?
+
+#4.
+./MAD-V1 read --fi IDEA
+    - Success, prints out ID and Idea column, wrapped and lined correctly
+
+#5. Filter IN - multiple columns
+./MAD-V1 read --fi IDEA TYPE LOCATION
+    - Success, prints out all chosen columns, wrapped and lined correctly
+
+#6. Filter OUT - single column
+./MAD-V1 read --fo NOTES
+    - Success, prints out everything correctly format MINUS notes column
+
+#7. Filter OUT - multiple columns
+./MAD-V1 read --fo SEASONAL DATE NOTES
+    - Success, prints out everything correctly BAR seasonal, date and notes columns
+
+#8. Invalid column name in filter
+./MAD-V1 read --fi INVALID_ARG
+    - PARTIAL. Prints out IDs and nothing else.
+    - TODO: Exit if NO VALID COLS exist
+
+#9. Conflicting filters (should error)
+./MAD-V1 read --fi IDEA --fo TYPE
+    -Success, throws error message explaining that both filters used
+
+#10. Order by Idea (default ascending)
+./MAD-V1 read --or Idea
+    - Success, prints out correctly in alphabetical order
+
+#11. Order by Idea descnding
+./MAD-V1 read --or Idea DESC
+
+#11. Order by Idea ascending
+./MAD-V1 read --or Idea asc
+
+#12. Order by each column (already tested Idea)
+./MAD-V1 read --or TYPE
+./MAD-V1 read --or SEASONAL
+./MAD-V1 read --or DATE
+./MAD-V1 read --or LOCATION
+./MAD-V1 read --or NOTES
+
+#15. Invalid column name for order
+./MAD-V1 read --or INVALID
+    - PARTIAL, prints out total of dates read THEN throws error message
+    - TODO: Adjusting printing order to print Errors and nothing else
+
+#16. Invalid order direction
+./MAD-V1 read --or idea INVALID
+    - Success, throws error message and doesnt print anything!
+
+#17. Order by date 
+./MAD-V1 read --or date
+    - TODO: Add special case to date format to order by year, month day to avoid errors
+    
+#18. Order by date descnding 
+./MAD-V1 read --or date desc
+    - TODO: Add special case to date format to order by year, month day to avoid errors
+
+#19. Search without --in (searches all columns)
+./MAD-V1 read --has "coffee"
+    - Success, checks multiple cols and prints out everything where coffee is mentioned
+
+#20. Search with multiple words (case insensitive)
+./MAD-V1 read --has "peak bloom"
+
+#21.  Search in specific column
+./MAD-V1 read --has "Dining" --in TYPE
+    - Success, returns dates with dinning type and nothing else.
+    - NOTE: Will also print out partial matches like "fine dinning", which is a success.
+
+#22.  Search in multiple columns
+./MAD-V1 read --has "park" --in LOCATION NOTES
+    - Success
+
+#23. Search with invalid column (should default to all)
+./MAD-V1 read --has "park" --in INVALID_COL
+    - Success
+
+#24.  Search with --in but no --has (should work normally)
+./MAD-V1 read --in TYPE IDEA
+    - Success, works normally.
+    - TODO: Adjust print order to say no has value entered so ignoreing correct in arguments. Looks sloppy saying "will search if valid has argument given"
+
+#25. Case insensitive search
+./MAD-V1 read --has "COFFEE"
+./MAD-V1 read --has "Coffee"
+./MAD-V1 read --has "coffee"
+    -Success!
+
+#26. Forgot quotes on multi-word search (should error)
+./MAD-V1 read --has coffee shop
+./MAD-V1 read --has coffee shop --in notes
+
+    -Success, throws error explaining issue and doesnt search
+
+# 27. Filter + Order
+./MAD-V1 read --fi IDEA TYPE --or IDEA desc
+    - Success
+
+# 28. Filter + Search
+./MAD-V1 read --fi IDEA LOCATION --has "park"
+    - Success, prints even matches in hidden columns
+    -TODO: Assess use case...... would everyone like this feature?
+
+# 29. Order + Search
+./MAD-V1 read --or idea --has "outdoor"
+    - Success
+
+# 30. Filter + Order + Search
+./MAD-V1 read --fi IDEA TYPE LOCATION --or ID DESC --has "ha"
+    - Success
+
+# 31. All flags together
+./MAD-V1 read --fi IDEA TYPE DATE LOCATION --or DATE ASC --has "summer" --in SEASONAL NOTES
+
+# 32. Filter OUT + Order + Search
+./MAD-V1 read --fo NOTES --or IDEA --has "cinema" --in TYPE
+    - Success, summer in seasonal but not printed
+
+# 33. Complex: Filter, Order type DESC, Search in multiple columns
+./MAD-V1 read --fi IDEA TYPE SEASONAL LOCATION --or TYPE DESC --has "night" --in IDEA NOTES
+    - Success
+
+# 34. Empty search string
+./MAD-V1 read --has ""
+    - Success, prints everything
+
+# 35. Search for special characters
+./MAD-V1 read --has "& restaurant"
+    - Success
+
+# 36. Very long search string
+./MAD-V1 read --has "this is a very long search query with many words"
+    - Success, if in JSON else success just not printed
+
+# 37. All columns filtered out
+./MAD-V1 read --fo IDEA TYPE SEASONAL DATE LOCATION NOTES
+    - Success, just prints ID
+
+# 38. Duplicate column names in filter
+./MAD-V1 read --fi IDEA IDEA TYPE
+    - Success, does it correctly
+    - TODO: Maybe dont reprint out the duplicate title?
+
+# 39. Mix of valid and invalid columns
+./MAD-V1 read --fi IDEA INVALID TYPE
+    - PARTIAL, does print out correctly, states INVALID column not found but also prints that it will filter it in.
+    - TODO: Fix printing errors 

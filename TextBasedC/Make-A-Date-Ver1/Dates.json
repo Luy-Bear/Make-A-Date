@@ -178,5 +178,14 @@
         "Date": "X/4/X",
         "Location": "Arboretum",
         "Notes": "Peak bloom usually early to mid April"
+    },
+    {
+        "id": 21,
+        "Idea": "Test",
+        "Type": "OutdoorDining",
+        "Seasonal": "Spring",
+        "Date": "X/4/X",
+        "Location": "Arboretum",
+        "Notes": "Coffee park & restaurant this is a very long search query with many words"
     }
 ]

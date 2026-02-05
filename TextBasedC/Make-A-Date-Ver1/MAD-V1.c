@@ -225,6 +225,7 @@
                                         first = 0;
                                     }
                                 }
+                                printf("\n");
                             }
                             break;
                         }
