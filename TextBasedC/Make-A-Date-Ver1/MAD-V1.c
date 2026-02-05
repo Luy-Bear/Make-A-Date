@@ -399,7 +399,7 @@
                     //If there is a value to search....
                     if(HasVal != NULL){
                         //Flags are either all set to 1 or select few, pass flag array into helper function
-                        if(DateHas(HasVal, InColFlagArr, Date)){ //TODO: Make DateHas fn, return true/false if Date hasq3 HasVal in columns specified 
+                        if(DateHas(HasVal, InColFlagArr, Date)){ 
                             // if found, add to dates using actual_count (creates compact array with no gaps)
                             Dates[actual_count] = Date;
                             actual_count++;
@@ -808,75 +808,79 @@
     }
 
     int DateHas(char* HasVal, int* InColFlagArr, cJSON* Date){
-        // Use str to upper to convert both to upper case, then strstr(date_upper, search_upper) to see if it contains, returns pointer or NULL if not found
-                    //Switch case statement based on In Flag (InColFlag - Int value, using consts)
-                    //Inside every case theres an if statement checking if contents of JSON attr == Has Arg, if true
-
-
-
-        //TODO: ...
+        //Clones values (to not effect printing), upper cases them. Then uses strstr to see if the HasValUpper (hasval)
+        // is contained in the column field, sets flag to 1, free vars and returns 1 else only frees ColFieldUpper
                 
-        // Make uppercase copy of search term once - stops in place capitalisation
-        char *search_upper = strdup(HasVal);
-        StrToUpper(search_upper);
-        
-        int found = 0;
+        // Make uppercase copy of search term once - stops in-place capitalisation affecting prints
+        char *HasValUpper = strdup(HasVal);
+        StrToUpper(HasValUpper);
         
         if(InColFlagArr[0]){
-            char *field_upper = strdup(ReturnJsonIdea(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonIdea(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
+        
         if(InColFlagArr[1]){
-            char *field_upper = strdup(ReturnJsonType(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonType(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
+        
         if(InColFlagArr[2]){
-            char *field_upper = strdup(ReturnJsonSeasonal(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonSeasonal(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
+        
         if(InColFlagArr[3]){
-            char *field_upper = strdup(ReturnJsonDate(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonDate(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
+        
         if(InColFlagArr[4]){
-            char *field_upper = strdup(ReturnJsonLocation(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonLocation(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
+        
         if(InColFlagArr[5]){
-            char *field_upper = strdup(ReturnJsonNotes(Date));
-            StrToUpper(field_upper);
-            if(strstr(field_upper, search_upper) != NULL){
-                found = 1;
+            char *ColFieldUpper = strdup(ReturnJsonNotes(Date));
+            StrToUpper(ColFieldUpper);
+            if(strstr(ColFieldUpper, HasValUpper) != NULL){
+                free(ColFieldUpper);
+                free(HasValUpper);
+                return 1;
             }
-            free(field_upper);
-            if(found) { free(search_upper); return 1; }
+            free(ColFieldUpper);
         }
 
-
+        free(HasValUpper);
         return 0;
     }
