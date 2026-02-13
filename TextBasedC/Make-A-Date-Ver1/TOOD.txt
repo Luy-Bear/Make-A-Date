@@ -30,8 +30,7 @@ Test Commands:
 
 #8. Invalid column name in filter
 ./MAD-V1 read --fi INVALID_ARG
-    - PARTIAL. Prints out IDs and nothing else.
-    - TODO: Exit if NO VALID COLS exist
+    - Success, prints error message and returns 1 for failure.
 
 #9. Conflicting filters (should error)
 ./MAD-V1 read --fi IDEA --fo TYPE
@@ -43,16 +42,18 @@ Test Commands:
 
 #11. Order by Idea descnding
 ./MAD-V1 read --or Idea DESC
+    - Success
 
 #11. Order by Idea ascending
 ./MAD-V1 read --or Idea asc
+    - Success
 
 #12. Order by each column (already tested Idea)
 ./MAD-V1 read --or TYPE
 ./MAD-V1 read --or SEASONAL
-./MAD-V1 read --or DATE
 ./MAD-V1 read --or LOCATION
 ./MAD-V1 read --or NOTES
+    - Success
 
 #15. Invalid column name for order
 ./MAD-V1 read --or INVALID
@@ -65,11 +66,11 @@ Test Commands:
 
 #17. Order by date 
 ./MAD-V1 read --or date
-    - TODO: Add special case to date format to order by year, month day to avoid errors
+    -Success, added special case to date format to order by year, month day to avoid errors
     
 #18. Order by date descnding 
 ./MAD-V1 read --or date desc
-    - TODO: Add special case to date format to order by year, month day to avoid errors
+    -Success, added special case to date format to order by year, month day to avoid errors
 
 #19. Search without --in (searches all columns)
 ./MAD-V1 read --has "coffee"
@@ -77,6 +78,7 @@ Test Commands:
 
 #20. Search with multiple words (case insensitive)
 ./MAD-V1 read --has "peak bloom"
+    - Success
 
 #21.  Search in specific column
 ./MAD-V1 read --has "Dining" --in TYPE

@@ -323,7 +323,7 @@
                     
                     //Loop through all filter fields and uses an if else str compare ladder to set column flags
                     for(int i=0; i< filter_count; i++){
-                        //Uses more mem short term but speeds up copmuting bu uppercasing once rather than several times
+                        //Uses more mem short term but speeds up copmuting by uppercasing once rather than several times
                         char *upper = StrToUpper(filter_fields[i]);
 
                         //If the uppercase string == column X, set flag X to 1. Array index adjusted as not doing IDs but ordering i will so need 0 to be id therefore offsetting vals in this case
@@ -359,6 +359,10 @@
                     }
                 }
 
+                if((FilterFlagArr[0] + FilterFlagArr[1] + FilterFlagArr[2] + FilterFlagArr[3] + FilterFlagArr[4] + FilterFlagArr[5])==0){
+                    printf("No valid columns can be printed, please input valid arguments for the filter command\n");
+                    return 1;
+                }
 
                 // Have an empty array to populate with dates to print
                 // We are using this as "json" is a linked list struct not a c array, Dates is an array that points to the original JSON array which lets you sort them with traditional sorting algos but moving the pointers leaving original structure unchanged
