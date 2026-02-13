@@ -4,7 +4,7 @@
         "Idea": "200 Degrees",
         "Type": "Coffee",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "West Bridgeford Central Ave",
         "Notes": "Slightly round the corner from the stop" 
     },
@@ -13,7 +13,7 @@
         "Idea": "Pumpkin Carving",
         "Type": "Arts and Crafts",
         "Seasonal": "Halloween",
-        "Date": "X/10/X",
+        "Date": "--/10/--",
         "Location": "Home",
         "Notes": "N/A"
     },
@@ -22,7 +22,7 @@
         "Idea": "Ice Skating",
         "Type": "Activity",
         "Seasonal": "Winter",
-        "Date": "X/12/X",
+        "Date": "--/12/--",
         "Location": "Nottingham Ice Arena",
         "Notes": "Book tickets in advance during peak season"
     },
@@ -31,7 +31,7 @@
         "Idea": "Picnic at Wollaton Park",
         "Type": "Outdoor",
         "Seasonal": "Summer",
-        "Date": "X/06/X",
+        "Date": "--/06/--",
         "Location": "Wollaton Park",
         "Notes": "Bring blanket and snacks, deer roam freely"
     },
@@ -40,7 +40,7 @@
         "Idea": "Cinema Night",
         "Type": "Entertainment",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Cineworld Nottingham",
         "Notes": "Check for student discounts on Wednesdays"
     },
@@ -49,7 +49,7 @@
         "Idea": "Bowling",
         "Type": "Activity",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Tenpin Nottingham",
         "Notes": "Good for rainy days, arcade games available"
     },
@@ -58,7 +58,7 @@
         "Idea": "Broadway Cinema",
         "Type": "Entertainment",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Hockley",
         "Notes": "Independent films, has a nice bar and cafe"
     },
@@ -67,7 +67,7 @@
         "Idea": "Afternoon Tea",
         "Type": "Dining",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Hart's Hotel",
         "Notes": "Booking required, dress smart casual"
     },
@@ -76,7 +76,7 @@
         "Idea": "Christmas Market",
         "Type": "Event",
         "Seasonal": "Christmas",
-        "Date": "X/12/X",
+        "Date": "--/12/--",
         "Location": "Old Market Square",
         "Notes": "Usually runs late November through December"
     },
@@ -85,7 +85,7 @@
         "Idea": "Crazy Golf",
         "Type": "Activity",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Ghetto Golf",
         "Notes": "Indoor venue with UV lighting, quirky decor"
     },
@@ -94,7 +94,7 @@
         "Idea": "Farmers Market",
         "Type": "Shopping",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Victoria Centre",
         "Notes": "Every second and fourth Saturday of the month"
     },
@@ -103,7 +103,7 @@
         "Idea": "Escape Room",
         "Type": "Activity",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Cryptology Nottingham",
         "Notes": "Book online, multiple themes available"
     },
@@ -112,7 +112,7 @@
         "Idea": "Sunset Walk",
         "Type": "Outdoor",
         "Seasonal": "Summer",
-        "Date": "X/07/X",
+        "Date": "--/07/--",
         "Location": "Attenborough Nature Reserve",
         "Notes": "Beautiful views, bring insect repellent"
     },
@@ -121,7 +121,7 @@
         "Idea": "Nottingham Castle",
         "Type": "Cultural",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Castle Quarter",
         "Notes": "Recently renovated, check opening times"
     },
@@ -130,7 +130,7 @@
         "Idea": "Pizza Making Class",
         "Type": "Food Experience",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Annie's Burger Shack",
         "Notes": "Fun hands-on activity, eat what you make"
     },
@@ -139,7 +139,7 @@
         "Idea": "Goose Fair",
         "Type": "Event",
         "Seasonal": "Autumn",
-        "Date": "X/10/X",
+        "Date": "--/10/--",
         "Location": "Forest Recreation Ground",
         "Notes": "First week of October, largest travelling fair in UK"
     },
@@ -148,7 +148,7 @@
         "Idea": "Brunch at Blend",
         "Type": "Dining",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Derby Road",
         "Notes": "Popular spot, weekend queues expected"
     },
@@ -157,7 +157,7 @@
         "Idea": "Kayaking on River Trent",
         "Type": "Activity",
         "Seasonal": "Summer",
-        "Date": "X/08/X",
+        "Date": "--/08/--",
         "Location": "National Water Sports Centre",
         "Notes": "Equipment provided, beginners welcome"
     },
@@ -166,7 +166,7 @@
         "Idea": "Live Music Night",
         "Type": "Entertainment",
         "Seasonal": "N/A",
-        "Date": "X/X/X",
+        "Date": "--/--/--",
         "Location": "Rock City",
         "Notes": "Check gig listings online, variety of genres"
     },
@@ -175,7 +175,7 @@
         "Idea": "Cherry Blossom Viewing",
         "Type": "Outdoor",
         "Seasonal": "Spring",
-        "Date": "X/04/X",
+        "Date": "--/04/--",
         "Location": "Arboretum",
         "Notes": "Peak bloom usually early to mid April"
     },
@@ -184,8 +184,144 @@
         "Idea": "Test",
         "Type": "OutdoorDining",
         "Seasonal": "Spring",
-        "Date": "X/04/X",
+        "Date": "--/04/--",
         "Location": "Arboretum",
         "Notes": "Coffee park & restaurant this is a very long search query with many words"
+    },
+    {
+        "id": 22,
+        "Idea": "New Year Party",
+        "Type": "Event",
+        "Seasonal": "Winter",
+        "Date": "01/01/24",
+        "Location": "Home",
+        "Notes": "Earliest date - 2024"
+    },
+    {
+        "id": 23,
+        "Idea": "Valentine's Date",
+        "Type": "Romantic",
+        "Seasonal": "Winter",
+        "Date": "14/02/24",
+        "Location": "Restaurant",
+        "Notes": "February 2024"
+    },
+    {
+        "id": 24,
+        "Idea": "Beach Day",
+        "Type": "Outdoor",
+        "Seasonal": "Summer",
+        "Date": "15/06/24",
+        "Location": "Beach",
+        "Notes": "Mid 2024"
+    },
+    {
+        "id": 25,
+        "Idea": "Christmas Market",
+        "Type": "Event",
+        "Seasonal": "Winter",
+        "Date": "20/12/24",
+        "Location": "City Centre",
+        "Notes": "End of 2024"
+    },
+    {
+        "id": 26,
+        "Idea": "New Year 2025",
+        "Type": "Event",
+        "Seasonal": "Winter",
+        "Date": "01/01/25",
+        "Location": "Home",
+        "Notes": "Start of 2025 - same day as ID 1 but different year"
+    },
+    {
+        "id": 27,
+        "Idea": "Movie Night",
+        "Type": "Indoor",
+        "Seasonal": "All",
+        "Date": "02/01/25",
+        "Location": "Cinema",
+        "Notes": "Early January - tests day ordering"
+    },
+    {
+        "id": 28,
+        "Idea": "Coffee Date",
+        "Type": "Casual",
+        "Seasonal": "All",
+        "Date": "01/02/25",
+        "Location": "Cafe",
+        "Notes": "Feb 1st - your problematic case!"
+    },
+    {
+        "id": 29,
+        "Idea": "Dinner Out",
+        "Type": "Dining",
+        "Seasonal": "All",
+        "Date": "02/02/25",
+        "Location": "Restaurant",
+        "Notes": "Feb 2nd - same month as ID 7"
+    },
+    {
+        "id": 30,
+        "Idea": "Spring Picnic",
+        "Type": "Outdoor",
+        "Seasonal": "Spring",
+        "Date": "15/03/25",
+        "Location": "Park",
+        "Notes": "March 2025"
+    },
+    {
+        "id": 31,
+        "Idea": "Museum Visit",
+        "Type": "Cultural",
+        "Seasonal": "All",
+        "Date": "05/06/25",
+        "Location": "Museum",
+        "Notes": "Early June"
+    },
+    {
+        "id": 32,
+        "Idea": "Concert",
+        "Type": "Event",
+        "Seasonal": "Summer",
+        "Date": "25/06/25",
+        "Location": "Arena",
+        "Notes": "Late June - same month as ID 10"
+    },
+    {
+        "id": 33,
+        "Idea": "Birthday",
+        "Type": "Celebration",
+        "Seasonal": "Summer",
+        "Date": "15/08/25",
+        "Location": "Various",
+        "Notes": "Mid 2025"
+    },
+    {
+        "id": 34,
+        "Idea": "Halloween",
+        "Type": "Event",
+        "Seasonal": "Autumn",
+        "Date": "31/10/25",
+        "Location": "Home",
+        "Notes": "October end"
+    },
+    {
+        "id": 35,
+        "Idea": "Winter Market",
+        "Type": "Event",
+        "Seasonal": "Winter",
+        "Date": "01/12/25",
+        "Location": "Town Square",
+        "Notes": "December start"
+    },
+    {
+        "id": 36,
+        "Idea": "Christmas 2025",
+        "Type": "Event",
+        "Seasonal": "Winter",
+        "Date": "25/12/25",
+        "Location": "Home",
+        "Notes": "End of 2025"
     }
+
 ]

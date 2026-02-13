@@ -1,24 +1,4 @@
-    // Get CMD line prompts [ ??,??]
-        // Add Dates too list based on filters
-            // (results in smaller mem allocaiton and less time deallocating)
-
-    // Reorder list on order if specified
-
-    // Print list fomrat + list item (COLOUR CODED??)
-        // Header and table top ASCII art stuff
-        // For every date
-            // blank line with walls (set fn!)
-            //  L Wall and indent
-            // Date attr and dividers (consider wrap)
-            // R wall
-            // blank line with walls (set fn!)
-        // Table floor!
-
-
-        // Function to go through list and deallocate mem
-
-
-    #include <stdio.h> //prints
+     #include <stdio.h> //prints
     #include <string.h> //string copmarisons
     #include <ctype.h> //strupr
     #include <cjson/cJSON.h> //JSON handling
@@ -33,7 +13,7 @@
     #define IDEA_WIDTH 15
     #define TYPE_WIDTH 15
     #define SEASONAL_WIDTH 10
-    #define DATE_WIDTH 7
+    #define DATE_WIDTH 8
     #define LOCATION_WIDTH 10
     #define NOTES_WIDTH 30
 
@@ -73,7 +53,11 @@
     //print JSON function
     void PrintJSONObjs(int FilterFlagArr[], cJSON *Dates[], int DateNums, char *order_direction);
 
-    
+    //Custom function to compare Date's Date for ordering
+    int DateCmp(char* DateA, char* DateB);
+    //Custom function to deal with generic date dates, so it handles -- as if XX
+    int CompareDateComponent(const char* a, const char* b);
+
     int main(int argc, char *argv[]){
         //Argc argument counter, arv is argument vector, array of char pointers listing all args
        printf("\n");
@@ -583,9 +567,8 @@
                 return strcmp(ReturnJsonSeasonal(a), ReturnJsonSeasonal(b));
             
             case DATE:
-                //TODO: ADJUST THIS SO IT FLIPS TO COMPARE YEAR/MONTH/DATE
-                return strcmp(ReturnJsonDate(a), ReturnJsonDate(b));
-            
+                //Special Case: Allows for ordering of dates by "year month day", when stored as "day month year"
+                return DateCmp(ReturnJsonDate(a), ReturnJsonDate(b));
             case LOCATION:
                 return strcmp(ReturnJsonLocation(a), ReturnJsonLocation(b));
         
@@ -883,4 +866,62 @@
 
         free(HasValUpper);
         return 0;
+    }
+
+
+    //Copmares the values specified by ValCol of two Date's dates and returns <0,0,1 if DatteA is bigger than or equal to or smaller than DateB, like strcmp as:
+    //return x < 0
+    //return x = 0
+    //return x > 1 
+
+    int DateCmp(char* DateA, char* DateB){
+        //Value to store strcmps value to save on fn calls
+        int result;
+        //  d d / m m / y y
+        //  0 1 2 3 4 5 6 7
+
+        //check if the Year is the same (done by checking, chars @ [6] onwards)
+        result = CompareDateComponent(&DateA[6], &DateB[6]);
+        //If the years are not the same (i.e different), return result to define order
+        if(result !=0){return result;}
+
+
+        //If years are the same, check if months are different (done by checking chars 3 and 4)
+        //To allow it to function inplace for strcmp need to change '/' to '\0'
+        DateA[5] = '\0';
+        DateB[5] = '\0';
+        //check if the Year is the same (done by checking, chars @ [6] onwards)
+        result = CompareDateComponent(&DateA[3], &DateB[3]);
+        //result the "/" from "\0" for printing purposes before result returned
+        DateA[5] = '/';
+        DateB[5] = '/';
+        
+        //If the months are not the same (i.e different), return result to define order
+        if(result !=0){return result;}
+
+
+        //If months the same, check if days are different (done by checking chars 0 and 1)
+        //To allow it to function inplace for strcmp need to change '/' to '\0'
+        DateA[2] = '\0';
+        DateB[2] = '\0';
+        //check if the Year is the same (done by checking, chars @ [6] onwards)
+        result = CompareDateComponent(&DateA[0], &DateB[0]);
+        //result the "/" from "\0" for printing purposes before result returned
+        DateA[2] = '/';
+        DateB[2] = '/';
+        
+        //No matter what the result is, return it. 
+        return result;
+    }
+
+    //Helper function that deals with "--" elements so they function like "X"
+    int CompareDateComponent(const char* a, const char* b) {
+        int isPlaceholderA = (a[0] == '-' && a[1] == '-');
+        int isPlaceholderB = (b[0] == '-' && b[1] == '-');
+        
+        if(isPlaceholderA && isPlaceholderB) return 0;  // Both placeholders
+        if(isPlaceholderA) return 1;   // A is placeholder, sort after B
+        if(isPlaceholderB) return -1;  // B is placeholder, sort after A
+        
+        return strcmp(a, b);  // Normal string comparison
     }
