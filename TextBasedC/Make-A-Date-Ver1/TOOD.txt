@@ -57,8 +57,7 @@ Test Commands:
 
 #15. Invalid column name for order
 ./MAD-V1 read --or INVALID
-    - PARTIAL, prints out total of dates read THEN throws error message
-    - TODO: Adjusting printing order to print Errors and nothing else
+    - Success, prints Errors and nothing else
 
 #16. Invalid order direction
 ./MAD-V1 read --or idea INVALID
@@ -95,8 +94,7 @@ Test Commands:
 
 #24.  Search with --in but no --has (should work normally)
 ./MAD-V1 read --in TYPE IDEA
-    - Success, works normally.
-    - TODO: Adjust print order to say no has value entered so ignoreing correct in arguments. Looks sloppy saying "will search if valid has argument given"
+    - Success, works and adjusted print order to say no has value entered so ignoreing correct in arguments.
 
 #25. Case insensitive search
 ./MAD-V1 read --has "COFFEE"
@@ -156,10 +154,8 @@ Test Commands:
 
 # 38. Duplicate column names in filter
 ./MAD-V1 read --fi IDEA IDEA TYPE
-    - Success, does it correctly
-    - TODO: Maybe dont reprint out the duplicate title?
+    - Success, does it correctly, without reprinting the column types over and over again
 
 # 39. Mix of valid and invalid columns
 ./MAD-V1 read --fi IDEA INVALID TYPE
-    - PARTIAL, does print out correctly, states INVALID column not found but also prints that it will filter it in.
-    - TODO: Fix printing errors 
+    - Does print out correctly, states INVALID column not found but also prints only cols that are to be filtered.

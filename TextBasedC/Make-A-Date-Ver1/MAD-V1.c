@@ -1,4 +1,4 @@
-     #include <stdio.h> //prints
+    #include <stdio.h> //prints
     #include <string.h> //string copmarisons
     #include <ctype.h> //strupr
     #include <cjson/cJSON.h> //JSON handling
@@ -57,6 +57,13 @@
     int DateCmp(char* DateA, char* DateB);
     //Custom function to deal with generic date dates, so it handles -- as if XX
     int CompareDateComponent(const char* a, const char* b);
+
+    //Write Section
+    //Removes \n on fgets fn
+    void RemoveNewline(char* str);
+    //Checks for user input
+    char* IdeaValid(char* UserIdea);
+
 
     int main(int argc, char *argv[]){
         //Argc argument counter, arv is argument vector, array of char pointers listing all args
@@ -137,6 +144,22 @@
                         case 'r':
                             // Take the argument as what to order it by 
                             order_field = StrToUpper(optarg);
+
+                            //Check what col to order by to pass into helper function to compare values of dates
+                            if(strcmp(order_field, "ID") == 0) order_field_int = ID;
+                            else if(strcmp(order_field, "IDEA") == 0) order_field_int = IDEA;
+                            else if(strcmp(order_field, "TYPE") == 0) order_field_int = TYPE;
+                            else if(strcmp(order_field, "SEASONAL") == 0) order_field_int = SEASONAL;
+                            else if(strcmp(order_field, "DATE") == 0) order_field_int = DATE;
+                            else if(strcmp(order_field, "LOCATION") == 0) order_field_int = LOCATION;
+                            else if(strcmp(order_field, "NOTES") == 0) order_field_int = NOTES;
+                            else {
+                                // Invalid column name, exit program
+                                fprintf(stderr, "Error: '%s' is not a valid column name for ordering\n", order_field);
+                                fprintf(stderr, "Valid columns: ID, IDEA, TYPE, SEASONAL, DATE, LOCATION, NOTES\n");
+                                exit(EXIT_FAILURE);
+                            }
+
                             // if there are more options, and theyre not a flag
                             if (optind < argc && argv[optind][0] != '-') {// take argumnet as direction but only if ASC or DESC (works for EVERYTHING)
                                 // strcmp returns 0 if string are identical, <0 if str1 comes before alphabetically and >0 if str1 comes after str 2 alphabetically 
@@ -195,22 +218,22 @@
                             }
                             printf("\n");
                             //If all the flags are set to 0, user still wants to search something potentially so set flags all to 1 to search whole obj not specific col
-                            if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
-                                //Else tell the user what cols are valid and are going to be searched
-                                printf("The following columns will be searched, if valid has argument given: ");
+                            // if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
+                            //     //Else tell the user what cols are valid and are going to be searched
+                            //     printf("The following columns will be searched, if valid has argument given: ");
 
-                                const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
+                            //     const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
 
-                                int first = 1;
-                                for(int i = 0; i < 6; i++) {
-                                    if(InColFlagArr[i]) {
-                                        if(!first) printf(", ");
-                                        printf("%s", display_names[i]);
-                                        first = 0;
-                                    }
-                                }
-                                printf("\n");
-                            }
+                            //     int first = 1;
+                            //     for(int i = 0; i < 6; i++) {
+                            //         if(InColFlagArr[i]) {
+                            //             if(!first) printf(", ");
+                            //             printf("%s", display_names[i]);
+                            //             first = 0;
+                            //         }
+                            //     }
+                            //     printf("\n");
+                            // }
                             break;
                         }
                         default:
@@ -230,20 +253,105 @@
                     printf("\n");
                 }
 
+
+                // Filter Flag Logic - Takes user filters and sets up flags for future use
+                // [0    1    2        3    4        5    ]
+                // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
+
+                int FilterFlagArr[6]={0}; //Makes 6 flags for all columns - ID not filterable, also initialise at 0 to remove garbage data.
+
+                //If not filter specified print eveyrthing so set flag values to 1
+                if(filter_field == '\0'){
+                    //Set flag values to 1
+                    for (int i = 0; i < 6; i++) {
+                        FilterFlagArr[i] = 1;
+                    }
+                }
+                else{
                 
-                // Display what was parsed
+                    //Loop through all filter fields and uses an if else str compare ladder to set column flags
+                    for(int i=0; i< filter_count; i++){
+                        //Uses more mem short term but speeds up copmuting by uppercasing once rather than several times
+                        char *upper = StrToUpper(filter_fields[i]);
+
+                        //If the uppercase string == column X, set flag X to 1. Array index adjusted as not doing IDs but ordering i will so need 0 to be id therefore offsetting vals in this case
+                        if(strcmp(upper, "IDEA") == 0) {
+                            FilterFlagArr[IDEA-1] = 1;
+                        }
+                        else if(strcmp(upper, "TYPE") == 0) {
+                            FilterFlagArr[TYPE-1] = 1;
+                        }
+                        else if(strcmp(upper, "SEASONAL") == 0) {
+                            FilterFlagArr[SEASONAL-1] = 1;
+                        }
+                        else if(strcmp(upper, "DATE") == 0) {
+                            FilterFlagArr[DATE-1] = 1;
+                        }
+                        else if(strcmp(upper, "LOCATION") == 0) {
+                            FilterFlagArr[LOCATION-1] = 1;
+                        }
+                        else if(strcmp(upper, "NOTES") == 0) {
+                            FilterFlagArr[NOTES-1] = 1;
+                        }
+                        else{
+                            printf("User input of '%s' not found\n", filter_fields[i]);
+                        }
+                    }
+                }
+                
+                
+                //If user species to filter out, flip flags
+                if(filter_field=='o'){
+                    for (int i = 0; i < 6; i++) {
+                        FilterFlagArr[i] = !(FilterFlagArr[i]);
+                    }
+                }
+
+                if((FilterFlagArr[0] + FilterFlagArr[1] + FilterFlagArr[2] + FilterFlagArr[3] + FilterFlagArr[4] + FilterFlagArr[5])==0){
+                    printf("No valid columns can be printed, please input valid arguments for the filter command\n");
+                    return 1;
+                }
+                
+                
                 if(filter_field == 'i'){printf("Filter In fields: ");}
                 else if(filter_field == 'o'){printf("Filter Out fields: ");}
 
-                //Display arguments
-                for (int i = 0; i < filter_count; i++) {
-                    printf("%s, ", filter_fields[i]);
-                }
+                //Display filter arguments
+                if(FilterFlagArr[0]){printf("Idea ");}
+                if(FilterFlagArr[1]){printf("Type ");}
+                if(FilterFlagArr[2]){printf("Seasonal ");}
+                if(FilterFlagArr[3]){printf("Date ");}
+                if(FilterFlagArr[4]){printf("Location ");}
+                if(FilterFlagArr[5]){printf("Notes ");}
                 printf("\n");
-                
+
+                //Display Order direction
                 if (order_field) {
                     printf("Order by: %s %s\n", order_field, 
                         order_direction ? order_direction : "ASC (by default)");
+                }
+ 
+                //Checks if valid has and in arguments provided
+                if(HasVal != NULL){
+                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
+                        //Else tell the user what cols are valid and are going to be searched
+                        printf("The following columns will be searched: ");
+    
+                        const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
+    
+                        int first = 1;
+                        for(int i = 0; i < 6; i++) {
+                            if(InColFlagArr[i]) {
+                                if(!first) printf(", ");
+                                printf("%s", display_names[i]);
+                                first = 0;
+                            }
+                        }
+                        printf("\n");
+                    }
+                }
+                else{
+                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0 ){printf("No valid value given to search for, showing all results...\n");}
                 }
                 
  
@@ -306,63 +414,7 @@
                 printf("____________________________________________________________________________\n\n\n\n");
 
 
-                // Filter Flag Logic - Takes user filters and sets up flags for future use
-                // [0    1    2        3    4        5    ]
-                // [IDEA TYPE SEASONAL DATE LOCATION NOTES]
-
-                int FilterFlagArr[6]={0}; //Makes 6 flags for all columns - ID not filterable, also initialise at 0 to remove garbage data.
-
-                //If not filter specified print eveyrthing so set flag values to 1
-                if(filter_field == '\0'){
-                    //Set flag values to 1
-                    for (int i = 0; i < 6; i++) {
-                        FilterFlagArr[i] = 1;
-                    }
-                }
-                else{
-                    
-                    //Loop through all filter fields and uses an if else str compare ladder to set column flags
-                    for(int i=0; i< filter_count; i++){
-                        //Uses more mem short term but speeds up copmuting by uppercasing once rather than several times
-                        char *upper = StrToUpper(filter_fields[i]);
-
-                        //If the uppercase string == column X, set flag X to 1. Array index adjusted as not doing IDs but ordering i will so need 0 to be id therefore offsetting vals in this case
-                        if(strcmp(upper, "IDEA") == 0) {
-                            FilterFlagArr[IDEA-1] = 1;
-                        }
-                        else if(strcmp(upper, "TYPE") == 0) {
-                            FilterFlagArr[TYPE-1] = 1;
-                        }
-                        else if(strcmp(upper, "SEASONAL") == 0) {
-                            FilterFlagArr[SEASONAL-1] = 1;
-                        }
-                        else if(strcmp(upper, "DATE") == 0) {
-                            FilterFlagArr[DATE-1] = 1;
-                        }
-                        else if(strcmp(upper, "LOCATION") == 0) {
-                            FilterFlagArr[LOCATION-1] = 1;
-                        }
-                        else if(strcmp(upper, "NOTES") == 0) {
-                            FilterFlagArr[NOTES-1] = 1;
-                        }
-                        else{
-                            printf("User input of '%s' not found\n", filter_fields[i]);
-                        }
-                    }
-                }
                 
-                
-                //If user species to filter out, flip flags
-                if(filter_field=='o'){
-                    for (int i = 0; i < 6; i++) {
-                        FilterFlagArr[i] = !(FilterFlagArr[i]);
-                    }
-                }
-
-                if((FilterFlagArr[0] + FilterFlagArr[1] + FilterFlagArr[2] + FilterFlagArr[3] + FilterFlagArr[4] + FilterFlagArr[5])==0){
-                    printf("No valid columns can be printed, please input valid arguments for the filter command\n");
-                    return 1;
-                }
 
                 // Have an empty array to populate with dates to print
                 // We are using this as "json" is a linked list struct not a c array, Dates is an array that points to the original JSON array which lets you sort them with traditional sorting algos but moving the pointers leaving original structure unchanged
@@ -406,29 +458,8 @@
 
                 // If user specifies a col to order by, order it in place in Dates arr and then print it using quick sort ...
                 if(order_field != NULL){        
-                          
-    
-                    //Check what col to order by to pass into helper function to compare values of dates
-                    if(strcmp(order_field, "ID") == 0) order_field_int = ID;
-                    else if(strcmp(order_field, "IDEA") == 0) order_field_int = IDEA;
-                    else if(strcmp(order_field, "TYPE") == 0) order_field_int = TYPE;
-                    else if(strcmp(order_field, "SEASONAL") == 0) order_field_int = SEASONAL;
-                    else if(strcmp(order_field, "DATE") == 0) order_field_int = DATE;
-                    else if(strcmp(order_field, "LOCATION") == 0) order_field_int = LOCATION;
-                    else if(strcmp(order_field, "NOTES") == 0) order_field_int = NOTES;
-                    else {
-                        // Invalid column name, exit program
-                        fprintf(stderr, "Error: '%s' is not a valid column name for ordering\n", order_field);
-                        fprintf(stderr, "Valid columns: ID, IDEA, TYPE, SEASONAL, DATE, LOCATION, NOTES\n");
-                        free(Dates);
-                        cJSON_Delete(json);
-                        exit(EXIT_FAILURE);
-                    }
-                    
-                    
-                //Implemented quick sort fn as a recursive function
+                    //Implemented quick sort fn as a recursive function - order_field_int is flag set in the argument switch case for options, specifies what field to order by
                     QuickSortDates(0, array_size-1, Dates, order_field_int); 
-                    
                 }
                 // ....if no order specified skip the if statement above and just print out in order it is read in
                 PrintJSONObjs(FilterFlagArr, Dates, array_size, order_direction);
@@ -439,12 +470,109 @@
             }
             else if (strcmp(StrToUpper(argv[1]), "WRITE") == 0){
                 printf("GOT INTO WRITE\n");
-            
+                //TODO: implement this!
+
+                //Check if all arguments specified (6 args + write command + run command):
+                if(argc == 8){
+                    //TODO: FINISH THIS
+
+                    // Extract args 
+                    char* UsrIdea = argv[2];
+                    char* UsrType = argv[3];
+                    char* UsrSeasonal = argv[4];
+                    char* UsrDate = argv[5];
+                    char* UsrLocation = argv[6];
+                    char* UsrNotes = argv[7];
+                
+
+                    //Add vars to JSON
+                    printf("%s %s %s %s %s %s", UsrIdea,UsrType,UsrSeasonal,UsrDate,UsrLocation,UsrNotes);
+
+                    // Check if correct type (Reuse function for the empty command run)
+                    // Add to vars
+                    
+                }
+                //Check if just write command specified (1 arg + write + run command)
+                else if(argc == 2){
+                    //Begin process of asking user for one input at a time, check type and validity using helper function x6
+                    
+                    // Fixed-size buffers NEEDED for user input
+                    char UsrIdea[100];
+                    char UsrType[50];
+                    char UsrSeasonal[50];
+                    char UsrDate[9];      // Exactly 8 chars + null terminator
+                    char UsrLocation[100];
+                    char UsrNotes[200];
+
+                    //Ask for Idea
+                    printf("Enter the date Idea: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrIdea, sizeof(UsrIdea), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrIdea);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Ask for Type
+                    printf("Enter the date type: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrType, sizeof(UsrType), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrType);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Ask for Seasonal
+                    printf("Enter what seasonal the date is for or \"NONE\" if not applicable: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrSeasonal, sizeof(UsrSeasonal), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrSeasonal);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Ask for Date
+                    printf("Enter the specific date in the form dd/mm/yy OR use \"--\" if theres no specific day/month/year for it: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrDate, sizeof(UsrDate), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrDate);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Ask for Date
+                    printf("Enter the dates location: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrLocation, sizeof(UsrLocation), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrLocation);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Ask for Note
+                    printf("Enter the any additional notes for the date: ");
+                    //Scan line, stops at '\n' between the "
+                    fgets(UsrNotes, sizeof(UsrNotes), stdin);
+                    //Remove \n from var
+                    RemoveNewline(UsrNotes);
+                    //Function to verify validity
+                    //TODO CHECK VALIDITY
+
+                    //Add vars to JSON
+                    printf("%s %s %s %s %s %s", UsrIdea,UsrType,UsrSeasonal,UsrDate,UsrLocation,UsrNotes);
+
+
+                }
+                else{
+                    //Error message saying to either write all args or just write.
+                    printf("ERROR: Incorect number of arguments following \"Write\" command\nPlease use either the write command and input your arguments when asked to or include all the 6 arguments at once in the following order: Idea, Type, Seasonal, Date, Locaton and Notes\n\n" );
+                    exit(EXIT_FAILURE);
+                }
+                
                 exit(EXIT_SUCCESS);
             }
             else{
                 printf("%s is not a valid operation, try read or write.\n\n", argv[1]);
-                
                 exit(EXIT_FAILURE);
             }
             
@@ -928,4 +1056,14 @@
         if(isPlaceholderB) return -1;  // B is placeholder, sort after A
         
         return strcmp(a, b);  // Normal string comparison
+    }
+
+    
+    //Removes \n char from user input on datesv 
+    void RemoveNewline(char* str) {
+        str[strcspn(str, "\n")] = '\0';
+    }
+
+    char* IdeaValid(char* UserIdea){
+        return UserIdea;
     }
