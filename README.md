@@ -21,9 +21,9 @@ This solution, which is currently a work in progress, is fully local and command
 - [x] Orders based on user chosen field 
   - [x] in ascending 
   - [x] in descending order
-  - [ ] Deals with special case for string calendar date formats
-- [ ] Searches for user inputted text
-  - [ ] can look if desired in specific attributes only
+  - [x] Deals with special case for string calendar date formats
+- [x] Searches for user inputted text using --has
+  - [x] can look if desired in specific attributes only using --in
 - [ ] Writes to JSON file
 
 ### Future Goals

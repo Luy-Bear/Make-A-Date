@@ -249,8 +249,8 @@
                     for(int i = 0; i < 6; i++) {
                         InColFlagArr[i] = 1;
                     }
-                    printf("No valid columns found, defaulting to search all columns");
-                    printf("\n");
+                    // printf("No valid columns found, defaulting to search all columns");
+                    // printf("\n");
                 }
 
 
@@ -313,17 +313,17 @@
                 }
                 
                 
-                if(filter_field == 'i'){printf("Filter In fields: ");}
-                else if(filter_field == 'o'){printf("Filter Out fields: ");}
+                if(filter_field == 'i'){printf("Filtering In fields: ");}
+                else if(filter_field == 'o'){printf("Filtering Out fields: ");}
 
                 //Display filter arguments
-                if(FilterFlagArr[0]){printf("Idea ");}
-                if(FilterFlagArr[1]){printf("Type ");}
-                if(FilterFlagArr[2]){printf("Seasonal ");}
-                if(FilterFlagArr[3]){printf("Date ");}
-                if(FilterFlagArr[4]){printf("Location ");}
-                if(FilterFlagArr[5]){printf("Notes ");}
-                printf("\n");
+                if(!FilterFlagArr[0]){printf("Idea ");}
+                if(!FilterFlagArr[1]){printf("Type ");}
+                if(!FilterFlagArr[2]){printf("Seasonal ");}
+                if(!FilterFlagArr[3]){printf("Date ");}
+                if(!FilterFlagArr[4]){printf("Location ");}
+                if(!FilterFlagArr[5]){printf("Notes ");}
+                printf("\n\n");
 
                 //Display Order direction
                 if (order_field) {
@@ -342,7 +342,7 @@
                         int first = 1;
                         for(int i = 0; i < 6; i++) {
                             if(InColFlagArr[i]) {
-                                if(!first) printf(", ");
+                                if(!first){printf(", ");}
                                 printf("%s", display_names[i]);
                                 first = 0;
                             }
