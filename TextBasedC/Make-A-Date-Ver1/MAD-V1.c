@@ -186,8 +186,7 @@
                                 fprintf(stderr, "Did you forget quotes? Use: --has \"word1 word2 ... wordx\"\n");
                                 exit(EXIT_FAILURE);
                             }
-                            printf("Searching for %s", HasVal);
-                            printf("\n");
+
                             break;
 
                         case 'n':{ //These is if user puts "in" in the arguemnts
@@ -217,23 +216,6 @@
                                 optind++;
                             }
                             printf("\n");
-                            //If all the flags are set to 0, user still wants to search something potentially so set flags all to 1 to search whole obj not specific col
-                            // if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
-                            //     //Else tell the user what cols are valid and are going to be searched
-                            //     printf("The following columns will be searched, if valid has argument given: ");
-
-                            //     const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
-
-                            //     int first = 1;
-                            //     for(int i = 0; i < 6; i++) {
-                            //         if(InColFlagArr[i]) {
-                            //             if(!first) printf(", ");
-                            //             printf("%s", display_names[i]);
-                            //             first = 0;
-                            //         }
-                            //     }
-                            //     printf("\n");
-                            // }
                             break;
                         }
                         default:
@@ -244,15 +226,41 @@
                     }
                 }
 
-                //Once all arguemnts parsed, check if no --in columns specified BUT ALSO --has value specified - in that case, print eveything 
+                //Once all arguemnts parsed....
+                //Print what searching for
+                printf("Searching for %s", HasVal);
+                printf("\n");
+                //check if no --in columns specified BUT ALSO --has value specified - in that case, print eveything 
                 if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) == 0 && HasVal != NULL){
                     for(int i = 0; i < 6; i++) {
                         InColFlagArr[i] = 1;
                     }
-                    // printf("No valid columns found, defaulting to search all columns");
-                    // printf("\n");
+                    printf("No valid columns to search in found, defaulting to search all columns");
+                    printf("\n");
                 }
-
+                //Checks if valid has and in arguments provided
+                if(HasVal != NULL){
+                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
+                        //Else tell the user what cols are valid and are going to be searched
+                        printf("The following columns will be searched: ");
+    
+                        const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
+    
+                        int first = 1;
+                        for(int i = 0; i < 6; i++) {
+                            if(InColFlagArr[i]) {
+                                if(!first) printf(", ");
+                                printf("%s", display_names[i]);
+                                first = 0;
+                            }
+                        }
+                        printf("\n");
+                    }
+                }
+                else{
+                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0 ){printf("No valid In value given to search for, showing all results...\n");}
+                }
+                printf("\n");
 
                 // Filter Flag Logic - Takes user filters and sets up flags for future use
                 // [0    1    2        3    4        5    ]
@@ -294,9 +302,10 @@
                             FilterFlagArr[NOTES-1] = 1;
                         }
                         else{
-                            printf("User input of '%s' not found\n", filter_fields[i]);
+                            printf("User input of '%s' not found as column name for fields to filter in/out\n", filter_fields[i]);
                         }
                     }
+                    printf("\n");
                 }
                 
                 
@@ -313,17 +322,31 @@
                 }
                 
                 
-                if(filter_field == 'i'){printf("Filtering In fields: ");}
-                else if(filter_field == 'o'){printf("Filtering Out fields: ");}
+                if(
+                    filter_field == 'i'){printf("Filter In fields: ");
+                    
+                    //Display filter arguments
+                    if(FilterFlagArr[0]){printf("Idea ");}
+                    if(FilterFlagArr[1]){printf("Type ");}
+                    if(FilterFlagArr[2]){printf("Seasonal ");}
+                    if(FilterFlagArr[3]){printf("Date ");}
+                    if(FilterFlagArr[4]){printf("Location ");}
+                    if(FilterFlagArr[5]){printf("Notes ");}
+                    printf("\n");
+                    
+                }
+                else if(
+                    filter_field == 'o'){printf("Filter Out fields: ");
 
-                //Display filter arguments
-                if(!FilterFlagArr[0]){printf("Idea ");}
-                if(!FilterFlagArr[1]){printf("Type ");}
-                if(!FilterFlagArr[2]){printf("Seasonal ");}
-                if(!FilterFlagArr[3]){printf("Date ");}
-                if(!FilterFlagArr[4]){printf("Location ");}
-                if(!FilterFlagArr[5]){printf("Notes ");}
-                printf("\n\n");
+                    //Display filter arguments
+                    if(FilterFlagArr[0]){printf("Idea ");}
+                    if(FilterFlagArr[1]){printf("Type ");}
+                    if(FilterFlagArr[2]){printf("Seasonal ");}
+                    if(FilterFlagArr[3]){printf("Date ");}
+                    if(FilterFlagArr[4]){printf("Location ");}
+                    if(FilterFlagArr[5]){printf("Notes ");}
+                    printf("\n");   
+                }
 
                 //Display Order direction
                 if (order_field) {
@@ -331,28 +354,7 @@
                         order_direction ? order_direction : "ASC (by default)");
                 }
  
-                //Checks if valid has and in arguments provided
-                if(HasVal != NULL){
-                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0){
-                        //Else tell the user what cols are valid and are going to be searched
-                        printf("The following columns will be searched: ");
-    
-                        const char* display_names[] = {"Idea", "Type", "Seasonal", "Date", "Location", "Notes"};
-    
-                        int first = 1;
-                        for(int i = 0; i < 6; i++) {
-                            if(InColFlagArr[i]) {
-                                if(!first){printf(", ");}
-                                printf("%s", display_names[i]);
-                                first = 0;
-                            }
-                        }
-                        printf("\n");
-                    }
-                }
-                else{
-                    if((InColFlagArr[0] + InColFlagArr[1] + InColFlagArr[2] + InColFlagArr[3] + InColFlagArr[4] + InColFlagArr[5]) != 0 ){printf("No valid value given to search for, showing all results...\n");}
-                }
+                
                 
  
                 // Open file to read
@@ -410,9 +412,7 @@
                 // Get array size for loop
                 int array_size = cJSON_GetArraySize(json);
                 
-                printf("Found %d dates...\n", array_size);
-                printf("____________________________________________________________________________\n\n\n\n");
-
+                printf("\nOut of %d dates, printing ", array_size); //PRINT CONTINUES AFTER THE ARRAY LIMITED
 
                 
 
@@ -455,6 +455,11 @@
 
                 // Update array_size to reflect actual number of dates added (not total JSON items)
                 array_size = actual_count;                
+
+                //CONTINUTATION OF PRINT STATEMENT "Out of %d dates, printing "
+                printf("%d...\n", array_size);
+                printf("____________________________________________________________________________\n\n\n\n");
+
 
                 // If user specifies a col to order by, order it in place in Dates arr and then print it using quick sort ...
                 if(order_field != NULL){        
