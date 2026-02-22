@@ -566,6 +566,7 @@
                 else{
                     //Error message saying to either write all args or just write.
                     printf("ERROR: Incorect number of arguments following \"Write\" command\nPlease use either the write command and input your arguments when asked to or include all the 6 arguments at once in the following order: Idea, Type, Seasonal, Date, Locaton and Notes\n\n" );
+                    printf("WARNING: Any multiple word inputs must be surrounded by \"s so program treats it as a single input\n\n");
                     exit(EXIT_FAILURE);
                 }
                 
