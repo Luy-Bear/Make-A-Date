@@ -57,41 +57,43 @@ The user can requeset the order to be **asc**ending or **desc**ending by followi
 ![IMAGE-ORDERING-IDEA-BY-DEFAULT](ReadMePhotos/OrderingByIdeaDefault.png)
 
 #### Date Syntax
-The Date format is a little differet. Due to the limitations of C and my own preference - it is stored and treated as a string value. This allows for Date plans that are seasnoal or an annual event to be stored using X as a place holder. For example a pumkin carving date during halloween can be repreesnted as "X/10/X".
+The Date format is a little differet. Due to the limitations of C and my own preference - it is stored and treated as a string value. This allows for Date plans that are seasnoal or an annual event to be stored using X as a place holder. For example a pumkin carving date during halloween can be repreesnted as `"X/10/X"`.
 
-This also comes with a drawback. As they are treated as string, when ordering by the "Date" column it is ordered alphanumerically. This means that the following dates "01/01/26", "02/01/26" and "01/02/26" would be ordered as "01/01...", "01/02/..." and "02/01..." due to the day being compared before the month or year. As search this required a unique solution.
+This also comes with a drawback. As they are treated as string, when ordering by the `Date` column it is ordered alphanumerically. This means that the following dates `01/01/26`, `02/01/26` and `01/02/26` would be ordered as `01/01...`, `01/02/...` and `02/01...` due to the day being compared before the month or year. As search this required a unique solution.
 
-[WIP] To solve this, the strings are broken down into Day, Month and Year using a function and compared in reverse order.This allows the user to sort the date data by date correctly.
+To solve this, the strings are broken down into Day, Month and Year using a function and compared in reverse order. This allows the user to sort the date data by date correctly.
 
-"X" values are stored as a infinitly large number and depending wether or not they fall on the day, month or year they are treated differently. For example, anything with an X in the year is towards the end as it can be done every year.
+"--" values are treated as an infinitly large number and depending wether or not they fall on the day, month or year they are treated differently. For example, anything with the '--' notation in the year is towards the end as it can be done every year.
 
-### Has [WIP]
+### Has
 The `--has` option flag takes in a string value as an argument and allows the user to search the database, only returning strings that match the input. This allows the user to filter the search even more finely. 
 
-For example, if a user wanted to return all dates that involve "coffee" or "happy hour", they can run the program with their chosen filters and order followed by `--has coffee` or `--happy hour`. This will limit what is printed to only include dates with those chosen words.
+For example, if a user wanted to return all dates that involve `coffee` or `happy hour`, they can run the program with their chosen filters and order followed by `--has coffee` or `--has happy hour`. This will limit what is printed to only include dates with those chosen words.
 
-This input must be surrounded by `"`s and is case sensitive and [WIP????] must match exactly to what is found, so "has happy hour" and "happy hour" will not match.
-
-```bash
-    ./NAME read --has "coffee"
-```
-[IMAGE-OF-HAS-COFFEE]
-
-### In [WIP]
-
-The option argument `--in` allows the user to specify in which column the search takes place. It accepts a single argument as a correct column name and will not run unless given a correct value. 
-
-This limit in the search area not only allows for faster speeds when searching large data sets but also allows for more specific filter. For example, you may have saved a bar that also serves coffee and mention this in the notes, a specific cafe saved under the type "Coffee" and hypothetically a restaurant that has Coffee in the name. If you wanted to specifically return the restaurant then the `--in name` option allows for this by limiting the search for coffee in name.
-
-The option must be followed by a correctly spelt column name and will only accept multiple column names to better customise the search criteria.
+This input must be surrounded by `"`s for multiple words and is case insensitive.
 
 ```bash
-    ./Name read --has "Coffee" --in name
+    ./NAME read --has "cofFeE"
 ```
+![IMAGE-OF-HAS-COFFEE](ReadMePhotos/HasCoffee.png)
+
+### In
+
+The option argument `--in` allows the user to specify in which column(s) the search takes place in. It accepts only correct column names and will not run unless given a correct value. 
+
+This limit in the search area not only allows for faster speeds when searching large data sets but also allows for more specific filter. For example, you may have saved a bar that also serves coffee and mention this in the notes, a specific cafe saved under the type "Coffee" and hypothetically a restaurant that has Coffee in Idea. If you wanted to specifically return the restaurant then the `--in Idea` option allows for this by limiting the search for coffee in idea.
+
+The option must be followed by a correctly spelt column name and will accept multiple column names to better customise the search criteria.
+
+```bash
+    ./Name read --has "Coffee" --in idea
+```
+![IMAGE-OF-HAS-COFFEE](ReadMePhotos/HasCoffeeInIdea.png)
 
 ```bash
     ./Name read --has "Coffee" --in name notes
 ```
+![IMAGE-OF-HAS-COFFEE](ReadMePhotos/HasCoffeeInIdeaAndNotes.png)
 
 ### Constants/Definitions
 Due to the differing width of the users screen, and to further improve user experience and customisation, allows for different printing widths. Admitedly harder to customise, the user can adapt the C code to change how wide each column can be in character length.
@@ -109,4 +111,20 @@ At the top in constants the user will find the following:
 
 These values are hard coded constants that allow the character width limits to be changed for each adn every column. For example, if the user didnt want to occupy the width of their screen with notes due to techincal limitations or preference, they can reduce the notes width, and where the notes would have overflown the program adds a "..." to signify it is wider than it is allowed to be.
 
-### Writing
+### Writing [WIP]
+The `write` command will allow the user to enter new date ideas without having to enter the JSON file and manually copy the format. This is done to reduce errors and simplify the process.
+
+The user has two options to do this, they can either run the program with the `write` command and enter the details when prompted or can type the `write` command with **ALL** the necessary vaules entered at once.
+
+If the desired input is more than one word long, the **user will be required** to enter the input surrounded in quotation marks.
+
+```bash
+    ./NAME write "Phantom Of The Opera" Play None 12/01/26 "Theatre Royal" n/a
+```
+[IMAGE-OF-WRITE-COMMAND-FOLLOWED-BY-ALL-COLs]
+
+
+```bash
+    ./NAME write
+```
+[IMAGE-OF-WRITE-COMMAND-A-FEW-STEPS-DOWN-THE-LINE]
